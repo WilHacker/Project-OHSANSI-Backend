@@ -16,7 +16,7 @@ class FaseGlobalSeeder extends Seeder
         $olimpiada = Olimpiada::updateOrCreate(
             [
                 'nombre'  => 'Olimpíada Tu Buena Vida',
-                'gestion' => '2025'
+                'gestion' => '2026'
             ],
             [
                 'estado' => 1
