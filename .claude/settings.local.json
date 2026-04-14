@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(gh pr create --title 'fix: agregar ConfiguracionAccionSeeder para resolver Acceso Restringido' --body ':*)",
+      "Bash(xargs grep:*)"
+    ]
+  }
+}
