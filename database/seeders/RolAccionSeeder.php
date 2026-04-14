@@ -16,7 +16,7 @@ class RolAccionSeeder extends Seeder
 
         if ($rolAdmin) {
             foreach ($accionesSistema as $accion) {
-                RolAccion::firstOrCreate(
+                RolAccion::updateOrCreate(
                     [
                         'id_rol' => $rolAdmin->id_rol,
                         'id_accion_sistema' => $accion->id_accion_sistema
