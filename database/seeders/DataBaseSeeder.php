@@ -17,6 +17,7 @@ class DatabaseSeeder extends Seeder
             AccionSistemaSeeder::class,
 
             RolAccionSeeder::class,
+            ConfiguracionAccionSeeder::class,
 
             DepartamentoSeeder::class,
             AreasSeeder::class,
