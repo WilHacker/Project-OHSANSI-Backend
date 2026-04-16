@@ -15,7 +15,14 @@ class ParametroMedallero extends Model
         'oro',
         'plata',
         'bronce',
-        'mencion'
+        'mencion',
+    ];
+
+    protected $casts = [
+        'oro'     => 'integer',
+        'plata'   => 'integer',
+        'bronce'  => 'integer',
+        'mencion' => 'integer',
     ];
 
     public function areaNivel()

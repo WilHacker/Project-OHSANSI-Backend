@@ -29,8 +29,4 @@ class EvaluadorAn extends Model
         return $this->belongsTo(AreaNivel::class, 'id_area_nivel');
     }
 
-    public function evaluaciones()
-    {
-        return $this->hasMany(Evaluacion::class, 'id_evaluador_an');
-    }
 }

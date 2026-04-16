@@ -2,6 +2,7 @@
 
 namespace App\Repositories;
 
+use App\Exceptions\AppException;
 use App\Model\Parametro;
 use App\Model\AreaNivel;
 use App\Model\Olimpiada;
@@ -33,25 +34,17 @@ class ParametroRepository
         $areaNivel = AreaNivel::with(['areaOlimpiada.olimpiada'])->find($data['id_area_nivel']);
         
         if (!$areaNivel) {
-            throw new \Exception('El Área-Nivel con ID ' . $data['id_area_nivel'] . ' no existe.');
+            throw new AppException('El Área-Nivel con ID ' . $data['id_area_nivel'] . ' no existe.', 422);
         }
-        
-        $olimpiadasActivas = Olimpiada::where('estado', true)->get();
-        
-        if ($olimpiadasActivas->isEmpty()) {
-            throw new \Exception('No hay olimpiadas activas.');
+
+        $idOlimpiadaActiva = Olimpiada::where('estado', true)->value('id_olimpiada');
+
+        if (!$idOlimpiadaActiva) {
+            throw new AppException('No hay olimpiadas activas. No se pueden guardar parámetros.', 422);
         }
-        
-        $perteneceAOlimpiadaActiva = false;
-        foreach ($olimpiadasActivas as $olimpiada) {
-            if ($areaNivel->areaOlimpiada->olimpiada->id_olimpiada === $olimpiada->id_olimpiada) {
-                $perteneceAOlimpiadaActiva = true;
-                break;
-            }
-        }
-        
-        if (!$perteneceAOlimpiadaActiva) {
-            throw new \Exception('No se puede guardar parámetros para una olimpiada no activa.');
+
+        if ($areaNivel->areaOlimpiada->olimpiada->id_olimpiada !== $idOlimpiadaActiva) {
+            throw new AppException('No se puede guardar parámetros para un área-nivel que no pertenece a la olimpiada activa.', 422);
         }
         
         $notaMinAprobacion = isset($data['nota_min_aprobacion']) && $data['nota_min_aprobacion'] !== '' 

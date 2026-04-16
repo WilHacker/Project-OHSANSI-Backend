@@ -17,12 +17,12 @@ class GradoEscolaridad extends Model
 
     public function areaNiveles()
     {
-    return $this->belongsToMany(
-        AreaNivelGrado::class,
-        'area_nivel_grado',
-        'id_grado_escolaridad',
-        'id_area_nivel'
-    );
+        return $this->belongsToMany(
+            AreaNivel::class,
+            'area_nivel_grado',
+            'id_grado_escolaridad',
+            'id_area_nivel'
+        );
     }
 
     public function competidores()

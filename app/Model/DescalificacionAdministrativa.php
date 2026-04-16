@@ -17,6 +17,7 @@ class DescalificacionAdministrativa extends Model
     protected $fillable = [
         'id_competidor',
         'observaciones',
+        'fecha_descalificacion',
     ];
 
     protected $casts = [

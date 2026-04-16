@@ -36,8 +36,4 @@ class AreaOlimpiada extends Model
         return $this->hasMany(AreaNivel::class, 'id_area_olimpiada', 'id_area_olimpiada');
     }
 
-    public function scopeActivas($query)
-    {
-        return $query->where('estado', true);
-    }
 }

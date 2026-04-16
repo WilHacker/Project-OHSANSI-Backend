@@ -21,6 +21,7 @@ class Parametro extends Model
 
     protected $casts = [
         'nota_min_aprobacion' => 'decimal:2',
+        'cantidad_maxima'     => 'integer',
     ];
 
     public function areaNivel()

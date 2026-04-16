@@ -69,13 +69,4 @@ class AreaNivel extends Model
         return $this->belongsToMany(GradoEscolaridad::class, 'area_nivel_grado', 'id_area_nivel', 'id_grado_escolaridad');
     }
 
-    public function grados()
-    {
-        return $this->belongsToMany(
-            GradoEscolaridad::class,
-            'area_nivel_grado',
-            'id_area_nivel',
-            'id_grado_escolaridad'
-        );
-    }
 }

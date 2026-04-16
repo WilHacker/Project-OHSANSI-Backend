@@ -50,4 +50,9 @@ class Competencia extends Model
     {
         return $this->belongsTo(Usuario::class, 'id_usuario_aval', 'id_usuario');
     }
+
+    public function medalleros(): HasMany
+    {
+        return $this->hasMany(Medallero::class, 'id_competencia', 'id_competencia');
+    }
 }

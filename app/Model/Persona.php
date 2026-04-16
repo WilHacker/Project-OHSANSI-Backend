@@ -27,8 +27,4 @@ class Persona extends Model
         return $this->hasMany(Competidor::class, 'id_persona', 'id_persona');
     }
 
-    public function competencias()
-    {
-        return $this->hasMany(Competencia::class, 'id_persona', 'id_persona');
-    }
 }

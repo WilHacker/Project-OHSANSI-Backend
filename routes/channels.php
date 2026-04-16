@@ -1,5 +1,10 @@
 <?php
 
+use App\Model\AreaNivel;
+use App\Model\Competencia;
+use App\Model\EvaluadorAn;
+use App\Model\Examen;
+use App\Model\ResponsableArea;
 use Illuminate\Support\Facades\Broadcast;
 
 /*
@@ -7,32 +12,89 @@ use Illuminate\Support\Facades\Broadcast;
 | Broadcast Channels
 |--------------------------------------------------------------------------
 |
-| Here you may register all of the event broadcasting channels that your
-| application supports. The given channel authorization callbacks are
-| used to check if an authenticated user can listen to the channel.
+| Autorización de canales privados de Reverb.
 |
+| Reglas generales:
+|   - examen.{id}      → solo evaluadores activos del área-nivel del examen
+|   - competencia.{id} → evaluadores activos O responsable del área-nivel
+|   - area-nivel.{id}  → evaluadores activos O responsable del área-nivel
+|   - usuario.{userId} → solo el propio usuario (canal de notificaciones personales)
+|   - sistema-global   → público (cualquier usuario logueado)
+|--------------------------------------------------------------------------
 */
 
+// Canal personal de Laravel (notificaciones internas del framework)
 Broadcast::channel('App.Models.User.{id}', function ($user, $id) {
     return (int) $user->id_usuario === (int) $id;
 });
 
-// CANAL EXAMEN
-// Escuchado por: CompetidorBloqueado, CompetidorLiberado, ExamenEstadoCambiado
+// ─── CANAL EXAMEN ──────────────────────────────────────────────────────────
+// Eventos: CompetidorBloqueado, CompetidorLiberado, ExamenEstadoCambiado
+// Acceso: evaluadores activos asignados al área-nivel del examen
 Broadcast::channel('examen.{id}', function ($user, $id) {
-    // Aquí podrías validar: $user->esJuezDelExamen($id)
-    // Por ahora, si está logueado, entra.
-    return $user !== null;
+    $examen = Examen::with('competencia:id_competencia,id_area_nivel')->find($id);
+
+    if (!$examen) {
+        return false;
+    }
+
+    return EvaluadorAn::where('id_usuario', $user->id_usuario)
+        ->where('id_area_nivel', $examen->competencia->id_area_nivel)
+        ->where('estado', 1)
+        ->exists();
 });
 
-// CANAL COMPETENCIA
-// Escuchado por: ExamenEstadoCambiado (para habilitar botón), CompetenciaFinalizada
+// ─── CANAL COMPETENCIA ─────────────────────────────────────────────────────
+// Eventos: ExamenEstadoCambiado, CompetenciaFinalizada, CompetenciaEstadoCambiado
+// Acceso: evaluadores activos O responsable del área-olimpiada de la competencia
 Broadcast::channel('competencia.{id}', function ($user, $id) {
-    // Si está logueado, puede ver el estado de la competencia
-    return $user !== null;
+    $competencia = Competencia::with('areaNivel:id_area_nivel,id_area_olimpiada')->find($id);
+
+    if (!$competencia) {
+        return false;
+    }
+
+    $idAreaNivel     = $competencia->id_area_nivel;
+    $idAreaOlimpiada = $competencia->areaNivel->id_area_olimpiada;
+
+    return EvaluadorAn::where('id_usuario', $user->id_usuario)
+            ->where('id_area_nivel', $idAreaNivel)
+            ->where('estado', 1)
+            ->exists()
+        || ResponsableArea::where('id_usuario', $user->id_usuario)
+            ->where('id_area_olimpiada', $idAreaOlimpiada)
+            ->exists();
 });
 
-// Canal público para el estado global del sistema
-Broadcast::channel('sistema-global', function () {
-    return true; // Cualquiera puede escuchar
+// ─── CANAL ÁREA-NIVEL ──────────────────────────────────────────────────────
+// Eventos: CompetenciaCreada
+// Acceso: evaluadores activos O responsable del área-olimpiada del área-nivel
+Broadcast::channel('area-nivel.{id}', function ($user, $id) {
+    $areaNivel = AreaNivel::find($id);
+
+    if (!$areaNivel) {
+        return false;
+    }
+
+    return EvaluadorAn::where('id_usuario', $user->id_usuario)
+            ->where('id_area_nivel', $id)
+            ->where('estado', 1)
+            ->exists()
+        || ResponsableArea::where('id_usuario', $user->id_usuario)
+            ->where('id_area_olimpiada', $areaNivel->id_area_olimpiada)
+            ->exists();
+});
+
+// ─── CANAL USUARIO PERSONAL ────────────────────────────────────────────────
+// Eventos: MisAccionesActualizadas
+// Acceso: solo el propio usuario
+Broadcast::channel('usuario.{userId}', function ($user, $userId) {
+    return (int) $user->id_usuario === (int) $userId;
+});
+
+// ─── CANAL PÚBLICO GLOBAL ──────────────────────────────────────────────────
+// Eventos: SistemaEstadoActualizado
+// Acceso: cualquier usuario autenticado
+Broadcast::channel('sistema-global', function ($user) {
+    return $user !== null;
 });
