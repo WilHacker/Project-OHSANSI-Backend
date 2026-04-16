@@ -16,7 +16,11 @@ class EvaluadorAn extends Model
     protected $fillable = [
         'id_usuario',
         'id_area_nivel',
-        'estado'
+        'estado',
+    ];
+
+    protected $casts = [
+        'estado' => 'boolean',
     ];
 
     public function usuario()

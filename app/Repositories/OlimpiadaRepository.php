@@ -7,80 +7,60 @@ use Illuminate\Database\Eloquent\Collection;
 
 class OlimpiadaRepository
 {
-    protected Olimpiada $model;
-
-    public function __construct(Olimpiada $olimpiada)
+    public function getAll(): Collection
     {
-        $this->model = $olimpiada;
+        return Olimpiada::orderBy('gestion', 'desc')->get();
     }
 
     public function getAnteriores(string $gestionActual): Collection
     {
-        return $this->model->where('gestion', '!=', $gestionActual)
-                          ->orderBy('gestion', 'desc')
-                          ->get();
+        return Olimpiada::where('gestion', '!=', $gestionActual)
+            ->orderBy('gestion', 'desc')
+            ->get();
     }
 
-    public function obtenerGestiones(): Collection
+    public function find(int $id): ?Olimpiada
     {
-        return $this->model->orderBy('gestion', 'desc')->get();
-    }
-
-    public function firstOrCreate(array $attributes, array $values = []): Olimpiada
-    {
-        return $this->model->firstOrCreate($attributes, $values);
-    }
-
-    public function obtenerOlimpiadasAnteriores($gestionActual): Collection
-    {
-        return $this->model->where('gestion', '!=', $gestionActual)
-                          ->orderBy('gestion', 'desc')
-                          ->get();
-    }
-
-    public function obtenerMasReciente(): ?Olimpiada
-    {
-        return Olimpiada::orderBy('gestion', 'desc')
-                        ->orderBy('id_olimpiada', 'desc')
-                        ->first();
+        return Olimpiada::find($id);
     }
 
     public function findActive(): ?Olimpiada
     {
         return Olimpiada::where('estado', true)
-            ->orderBy('id_olimpiada', 'desc')
+            ->orderByDesc('id_olimpiada')
             ->first();
     }
 
-     public function create(array $data): Olimpiada
+    public function obtenerMasReciente(): ?Olimpiada
     {
-        return $this->model->create(array_merge($data, ['estado' => false]));
+        return Olimpiada::orderByDesc('gestion')
+            ->orderByDesc('id_olimpiada')
+            ->first();
     }
 
-    public function find(int $id): ?Olimpiada
+    public function firstOrCreate(array $attributes, array $values = []): Olimpiada
     {
-        return $this->model->find($id);
+        return Olimpiada::firstOrCreate($attributes, $values);
     }
 
-    public function desactivarTodas(): void
+    public function create(array $data): Olimpiada
     {
-        $this->model->query()->update(['estado' => false]);
-    }
-
-    public function activar(int $id): bool
-    {
-        return $this->model->where('id_olimpiada', $id)->update(['estado' => true]);
+        $data['estado'] = $data['estado'] ?? false;
+        return Olimpiada::create($data);
     }
 
     public function update(int $id, array $data): bool
     {
-        return $this->model->where('id_olimpiada', $id)->update($data);
+        return (bool) Olimpiada::where('id_olimpiada', $id)->update($data);
     }
 
-    public function createConEstado(array $data): Olimpiada
+    public function desactivarTodas(): void
     {
-        $data['estado'] = $data['estado'] ?? false;
+        Olimpiada::query()->update(['estado' => false]);
+    }
 
-        return $this->model->create($data);
+    public function activar(int $id): bool
+    {
+        return (bool) Olimpiada::where('id_olimpiada', $id)->update(['estado' => true]);
     }
 }

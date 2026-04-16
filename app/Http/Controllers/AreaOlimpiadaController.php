@@ -5,197 +5,104 @@ namespace App\Http\Controllers;
 use App\Services\AreaOlimpiadaService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Routing\Controller;
-use Illuminate\Http\Request;
 use App\Model\Olimpiada;
 use App\Model\FaseGlobal;
 
 class AreaOlimpiadaController extends Controller
 {
-    protected $areaOlimpiadaService;
-
-    public function __construct(AreaOlimpiadaService $areaOlimpiadaService)
-    {
-        $this->areaOlimpiadaService = $areaOlimpiadaService;
-    }
+    public function __construct(
+        protected AreaOlimpiadaService $areaOlimpiadaService
+    ) {}
 
     public function getAreasByOlimpiada(int $identifier): JsonResponse
     {
-        try {
-            $areas = $this->areaOlimpiadaService->getAreasByOlimpiada($identifier);
-
-            return response()->json([
-                'message' => 'Áreas obtenidas exitosamente para la olimpiada.',
-                'data' => $areas
-            ]);
-        } catch (\Exception $e) {
-            return response()->json([
-                'message' => 'Error al obtener las áreas de la olimpiada.',
-                'error' => $e->getMessage()
-            ], 500);
-        }
+        return response()->json([
+            'message' => 'Áreas obtenidas exitosamente para la olimpiada.',
+            'data'    => $this->areaOlimpiadaService->getAreasByOlimpiada($identifier),
+        ]);
     }
 
     public function getAreasGestionActual(): JsonResponse
     {
-        try {
-            $areas = $this->areaOlimpiadaService->getAreasGestionActual();
-            
-            return response()->json([
-                'success' => true,
-                'data' => $areas
-            ]);
-            
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Error al obtener las áreas: ' . $e->getMessage()
-            ], 500);
-        }
+        return response()->json([
+            'success' => true,
+            'data'    => $this->areaOlimpiadaService->getAreasGestionActual(),
+        ]);
     }
 
     public function getNombresAreasGestionActual(): JsonResponse
     {
-        try {
-            $nombresAreas = $this->areaOlimpiadaService->getNombresAreasGestionActual();
-            
-            return response()->json([
-                'success' => true,
-                'data' => $nombresAreas
-            ]);
-            
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Error al obtener los nombres de las áreas: ' . $e->getMessage()
-            ], 500);
-        }
+        return response()->json([
+            'success' => true,
+            'data'    => $this->areaOlimpiadaService->getNombresAreasGestionActual(),
+        ]);
     }
-    
+
     public function getAreasByGestion(string $gestion): JsonResponse
     {
-        try {
-            $areas = $this->areaOlimpiadaService->getAreasByGestion($gestion);
+        $areas    = $this->areaOlimpiadaService->getAreasByGestion($gestion);
+        $olimpiada = Olimpiada::where('gestion', $gestion)->first();
 
-            $olimpiada = Olimpiada::where('gestion', $gestion)->first();
-            $mensajeFase = '';
-        
-            if ($olimpiada) {
-
-                $faseActiva = FaseGlobal::where('id_olimpiada', $olimpiada->id_olimpiada)
-                    ->where(function($query) {
-
-                        $query->where('nombre', 'like', '%Evaluación%')
-                              ->orWhere('nombre', 'like', '%Calificación%')
-                              ->orWhere('nombre', 'like', '%evaluación%')
-                              ->orWhere('nombre', 'like', '%calificación%');
-                    })
-                    ->whereHas('cronogramas', function($query) {
-
-                        $query->where('estado', true);
-                    })
-                    ->first();
-                
-                if ($faseActiva) {
-                    $mensajeFase = 'La funcionalidad de asignar niveles a un Área no está disponible porque el proceso de evaluación ha iniciado. Solo puede ver las asignaciones previamente realizadas.';
-                } else {
-
-                    $faseGlobalActiva = FaseGlobal::where('id_olimpiada', $olimpiada->id_olimpiada)
-                        ->whereHas('cronogramas', function($query) {
-                            $query->where('estado', true);
-                        })
-                        ->first();
-                    
-                    if ($faseGlobalActiva) {
-
-                        $mensajeFase = 'No existe un proceso de evaluación activo.';
-                    } else {
-
-                        $mensajeFase = 'No existe un proceso de evaluación.';
-                    }
-                }
-            } else {
-                $mensajeFase = 'No se encontró la olimpiada para la gestión proporcionada.';
-            }
-
-            return response()->json([
-                'success' => true,
-                'message' => $mensajeFase,
-                'data' => $areas
-            ]);
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => "Error al obtener las áreas para la gestión {$gestion}",
-                'error' => $e->getMessage()
-            ], 500);
-        }
+        return response()->json([
+            'success' => true,
+            'message' => $olimpiada
+                ? $this->mensajeFase($olimpiada->id_olimpiada)
+                : 'No se encontró la olimpiada para la gestión proporcionada.',
+            'data'    => $areas,
+        ]);
     }
 
     public function getAreasByResponsableActiva(int $idResponsable): JsonResponse
     {
-        try {
-            $olimpiadaActiva = Olimpiada::where('estado', true)->first();
-            
-            if (!$olimpiadaActiva) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'No hay ninguna olimpiada activa en este momento.'
-                ], 404);
-            }
-            
-            $areas = $this->areaOlimpiadaService->getAreasByOlimpiadaAndResponsable(
-                $olimpiadaActiva->id_olimpiada, 
-                $idResponsable
-            );
-            
-            $mensajeFase = '';
-            $faseActiva = FaseGlobal::where('id_olimpiada', $olimpiadaActiva->id_olimpiada)
-                ->where(function($query) {
-                    $query->where('nombre', 'like', '%Evaluación%')
-                          ->orWhere('nombre', 'like', '%Calificación%')
-                          ->orWhere('nombre', 'like', '%evaluación%')
-                          ->orWhere('nombre', 'like', '%calificación%');
-                })
-                ->whereHas('cronogramas', function($query) {
-                    $query->where('estado', true);
-                })
-                ->first();
-            
-            if ($faseActiva) {
-                $mensajeFase = 'La funcionalidad de asignar niveles a un Área no está disponible porque el proceso de evaluación ha iniciado. Solo puede ver las asignaciones previamente realizadas.';
-            } else {
-                $faseGlobalActiva = FaseGlobal::where('id_olimpiada', $olimpiadaActiva->id_olimpiada)
-                    ->whereHas('cronogramas', function($query) {
-                        $query->where('estado', true);
-                    })
-                    ->first();
-                
-                if ($faseGlobalActiva) {
-                    $mensajeFase = 'No existe un proceso de evaluación activo.';
-                } else {
-                    $mensajeFase = 'No existe un proceso de evaluación.';
-                }
-            }
+        $olimpiada = Olimpiada::where('estado', true)->first();
 
-            return response()->json([
-                'success' => true,
-                'message' => $mensajeFase,
-                'data' => $areas,
-                'total' => $areas->count(),
-                'olimpiada' => [
-                    'id' => $olimpiadaActiva->id_olimpiada,
-                    'nombre' => $olimpiadaActiva->nombre,
-                    'gestion' => $olimpiadaActiva->gestion,
-                    'estado' => $olimpiadaActiva->estado
-                ],
-                'id_responsable' => $idResponsable
-            ]);
-            
-        } catch (\Exception $e) {
+        if (!$olimpiada) {
             return response()->json([
                 'success' => false,
-                'message' => 'Error al obtener las áreas: ' . $e->getMessage()
-            ], 500);
+                'message' => 'No hay ninguna olimpiada activa en este momento.',
+            ], 404);
         }
+
+        $areas = $this->areaOlimpiadaService->getAreasByOlimpiadaAndResponsable(
+            $olimpiada->id_olimpiada,
+            $idResponsable
+        );
+
+        return response()->json([
+            'success'        => true,
+            'message'        => $this->mensajeFase($olimpiada->id_olimpiada),
+            'data'           => $areas,
+            'total'          => $areas->count(),
+            'olimpiada'      => [
+                'id'      => $olimpiada->id_olimpiada,
+                'nombre'  => $olimpiada->nombre,
+                'gestion' => $olimpiada->gestion,
+                'estado'  => $olimpiada->estado,
+            ],
+            'id_responsable' => $idResponsable,
+        ]);
+    }
+
+    private function mensajeFase(int $idOlimpiada): string
+    {
+        $evaluacionActiva = FaseGlobal::where('id_olimpiada', $idOlimpiada)
+            ->where(function ($q) {
+                $q->where('nombre', 'like', '%valuaci%')
+                  ->orWhere('nombre', 'like', '%alificaci%');
+            })
+            ->whereHas('cronograma', fn ($q) => $q->where('estado', true))
+            ->exists();
+
+        if ($evaluacionActiva) {
+            return 'La funcionalidad de asignar niveles a un Área no está disponible porque el proceso de evaluación ha iniciado. Solo puede ver las asignaciones previamente realizadas.';
+        }
+
+        $hayFase = FaseGlobal::where('id_olimpiada', $idOlimpiada)
+            ->whereHas('cronograma', fn ($q) => $q->where('estado', true))
+            ->exists();
+
+        return $hayFase
+            ? 'No existe un proceso de evaluación activo.'
+            : 'No existe un proceso de evaluación.';
     }
 }

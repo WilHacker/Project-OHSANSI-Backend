@@ -47,9 +47,9 @@ class OlimpiadaService
         return $this->olimpiadaRepository->getAnteriores($gestionActual);
     }
 
-    public function obtenerGestiones(): Collection
+    public function getAll(): Collection
     {
-        $gestiones = $this->olimpiadaRepository->obtenerGestiones();
+        $gestiones = $this->olimpiadaRepository->getAll();
         $currentYear = date('Y');
 
         return $gestiones->map(function ($olimpiada) use ($currentYear) {
@@ -89,15 +89,15 @@ class OlimpiadaService
         if ($quiereSerActiva) {
             return DB::transaction(function () use ($data) {
                 $this->olimpiadaRepository->desactivarTodas();
-                return $this->olimpiadaRepository->createConEstado($data);
+                return $this->olimpiadaRepository->create($data);
             });
         }
-        return $this->olimpiadaRepository->createConEstado($data);
+        return $this->olimpiadaRepository->create($data);
     }
 
     public function obtenerTodasOlimpiadas(): Collection
     {
-        $olimpiadas = $this->olimpiadaRepository->obtenerGestiones();
+        $olimpiadas = $this->olimpiadaRepository->getAll();
 
         return $olimpiadas->map(function ($olimpiada) {
             return [

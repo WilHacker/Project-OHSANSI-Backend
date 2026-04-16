@@ -14,13 +14,13 @@ class FaseGlobal extends Model
 
     protected $fillable = [
         'id_olimpiada',
-        'codigo', // Ej: CONFIGURACION, EVALUACION, FINAL
+        'codigo',
         'nombre',
         'orden',
     ];
 
     protected $casts = [
-        'orden' => 'integer',
+        'orden'        => 'integer',
         'id_olimpiada' => 'integer',
     ];
 
@@ -32,5 +32,15 @@ class FaseGlobal extends Model
     public function cronograma()
     {
         return $this->hasOne(CronogramaFase::class, 'id_fase_global', 'id_fase_global');
+    }
+
+    public function configuraciones()
+    {
+        return $this->hasMany(ConfiguracionAccion::class, 'id_fase_global', 'id_fase_global');
+    }
+
+    public function competencias()
+    {
+        return $this->hasMany(Competencia::class, 'id_fase_global', 'id_fase_global');
     }
 }

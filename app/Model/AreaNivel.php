@@ -19,6 +19,10 @@ class AreaNivel extends Model
         'es_activo',
     ];
 
+    protected $casts = [
+        'es_activo' => 'boolean',
+    ];
+
     public function areaOlimpiada()
     {
         return $this->belongsTo(AreaOlimpiada::class, 'id_area_olimpiada', 'id_area_olimpiada');

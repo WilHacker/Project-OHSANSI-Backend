@@ -3,36 +3,36 @@
 namespace App\Services;
 
 use App\Repositories\AreaOlimpiadaRepository;
+use App\Model\Olimpiada;
 use Illuminate\Support\Collection;
 
 class AreaOlimpiadaService
 {
-    protected $areaOlimpiadaRepository;
-
-    public function __construct(AreaOlimpiadaRepository $areaOlimpiadaRepository)
-    {
-        $this->areaOlimpiadaRepository = $areaOlimpiadaRepository;
-    }
+    public function __construct(
+        protected AreaOlimpiadaRepository $areaOlimpiadaRepository
+    ) {}
 
     public function getAreasByOlimpiada(int|string $identifier): Collection
     {
-        if (is_numeric($identifier) && strlen((string)$identifier) === 4) {
+        if (is_numeric($identifier) && strlen((string) $identifier) === 4) {
             return $this->areaOlimpiadaRepository->findAreasByGestion((string) $identifier);
         }
 
         return $this->areaOlimpiadaRepository->findAreasByOlimpiadaId((int) $identifier);
     }
 
-    public function getAreasGestionActual()
+    public function getAreasGestionActual(): Collection
     {
-        $gestionActual = date('Y');
-        return $this->areaOlimpiadaRepository->findAreasByGestionN($gestionActual);
+        $olimpiada = Olimpiada::where('estado', true)->first();
+
+        return $olimpiada
+            ? $this->areaOlimpiadaRepository->findAreasByGestion($olimpiada->gestion)
+            : collect();
     }
 
-    public function getNombresAreasGestionActual()
+    public function getNombresAreasGestionActual(): Collection
     {
-    $areas = $this->getAreasGestionActual();
-    return $areas->pluck('nombre', 'id_area');
+        return $this->getAreasGestionActual()->pluck('nombre', 'id_area');
     }
 
     public function getAreasByGestion(string $gestion): Collection

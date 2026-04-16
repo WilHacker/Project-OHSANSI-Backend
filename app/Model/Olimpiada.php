@@ -5,7 +5,8 @@ namespace App\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Olimpiada extends Model {
+class Olimpiada extends Model
+{
     use HasFactory;
 
     protected $table = 'olimpiada';
@@ -22,22 +23,24 @@ class Olimpiada extends Model {
         'estado' => 'boolean',
     ];
 
-    public static $rules = [
-        'nombre' => 'required|string|max:255',
-        'gestion' => 'required|string|size:4',
-    ];
-
-    public static $updateRules = [
-        'nombre' => 'string|max:255',
-        'gestion' => 'string|size:4',
-    ];
-
-    public function areas() {
-        return $this->belongsToMany(Area::class, 'area_olimpiada', 'id_olimpiada', 'id_area')->withTimestamps();
+    public function areas()
+    {
+        return $this->belongsToMany(Area::class, 'area_olimpiada', 'id_olimpiada', 'id_area')
+                    ->withTimestamps();
     }
 
-    public function areaOlimpiadas() {
+    public function areaOlimpiadas()
+    {
         return $this->hasMany(AreaOlimpiada::class, 'id_olimpiada', 'id_olimpiada');
+    }
 
+    public function faseGlobales()
+    {
+        return $this->hasMany(FaseGlobal::class, 'id_olimpiada', 'id_olimpiada');
+    }
+
+    public function usuarioRoles()
+    {
+        return $this->hasMany(UsuarioRol::class, 'id_olimpiada', 'id_olimpiada');
     }
 }

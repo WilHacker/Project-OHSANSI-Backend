@@ -23,11 +23,6 @@ class Area extends Model
                     ->withTimestamps();
     }
 
-    public function areaOlimpiada()
-    {
-        return $this->hasMany(AreaOlimpiada::class, 'id_area', 'id_area');
-    }
-
     public function areaOlimpiadas()
     {
         return $this->hasMany(AreaOlimpiada::class, 'id_area', 'id_area');

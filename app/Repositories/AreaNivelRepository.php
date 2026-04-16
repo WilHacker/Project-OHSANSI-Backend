@@ -3,8 +3,6 @@
 namespace App\Repositories;
 
 use App\Model\AreaNivel;
-use App\Model\Area;
-use App\Model\Nivel;
 use App\Model\AreaOlimpiada;
 use Illuminate\Database\Eloquent\Collection;
 
@@ -17,9 +15,9 @@ class AreaNivelRepository
 
     public function getByArea(int $id_area, int $id_olimpiada): Collection
     {
-        return AreaNivel::whereHas('areaOlimpiada', function($query) use ($id_area, $id_olimpiada) {
-            $query->where('id_area', $id_area)
-                  ->where('id_olimpiada', $id_olimpiada);
+        return AreaNivel::whereHas('areaOlimpiada', function ($q) use ($id_area, $id_olimpiada) {
+            $q->where('id_area', $id_area)
+              ->where('id_olimpiada', $id_olimpiada);
         })->with(['nivel', 'areaOlimpiada'])->get();
     }
 
@@ -35,24 +33,12 @@ class AreaNivelRepository
 
     public function update(int $id, array $data): bool
     {
-        $areaNivel = AreaNivel::find($id);
-        
-        if (!$areaNivel) {
-            return false;
-        }
-
-        return $areaNivel->update($data);
+        return AreaNivel::findOrFail($id)->update($data);
     }
 
     public function delete(int $id): bool
     {
-        $areaNivel = AreaNivel::find($id);
-        
-        if (!$areaNivel) {
-            return false;
-        }
-
-        return $areaNivel->delete();
+        return (bool) AreaNivel::findOrFail($id)->delete();
     }
 
     public function getByAreaAndNivel(int $id_area_olimpiada, int $id_nivel): ?AreaNivel

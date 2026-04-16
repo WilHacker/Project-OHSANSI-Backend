@@ -3,50 +3,36 @@
 namespace App\Repositories;
 
 use App\Model\Area;
-use Illuminate\Support\Collection;
+use Illuminate\Database\Eloquent\Collection;
 
-class AreaRepository{
-
-    public function getAllAreas(){
-        return Area::all();
+class AreaRepository
+{
+    public function getAllAreas(): Collection
+    {
+        return Area::orderBy('nombre')->get();
     }
 
-    public function createArea(array $data){
-
+    public function createArea(array $data): Area
+    {
         return Area::create($data);
-
     }
 
-    public function getAreasByGestion(string $gestion)
-
+    public function getAreasByGestion(string $gestion): Collection
     {
-
-        return Area::whereHas('olimpiadas', function ($query) use ($gestion) {
-
-            $query->where('gestion', $gestion);
-
-        })->select('id_area', 'nombre')->get();
-
-    }
-
-    /**
-     * Obtiene las áreas asignadas a un responsable en la Olimpiada ACTIVA.
-     */
-    public function getByResponsableActual(int $idUsuario): Collection
-    {
-        return Area::query()
+        return Area::whereHas('olimpiadas', fn ($q) => $q->where('gestion', $gestion))
             ->select('id_area', 'nombre')
-            ->whereHas('areaOlimpiadas', function ($q) use ($idUsuario) {
-                // 1. Filtro de Olimpiada Activa
-                $q->whereHas('olimpiada', function ($qOlim) {
-                    $qOlim->where('estado', 1);
-                })
-                // 2. Filtro de Responsable Asignado
-                ->whereHas('responsableArea', function ($qResp) use ($idUsuario) {
-                    $qResp->where('id_usuario', $idUsuario);
-                });
-            })
+            ->orderBy('nombre')
             ->get();
     }
 
+    public function getByResponsableActual(int $idUsuario): Collection
+    {
+        return Area::select('id_area', 'nombre')
+            ->whereHas('areaOlimpiadas', function ($q) use ($idUsuario) {
+                $q->whereHas('olimpiada', fn ($qO) => $qO->where('estado', true))
+                  ->whereHas('responsableArea', fn ($qR) => $qR->where('id_usuario', $idUsuario));
+            })
+            ->orderBy('nombre')
+            ->get();
+    }
 }

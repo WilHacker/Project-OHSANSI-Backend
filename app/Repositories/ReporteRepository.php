@@ -7,7 +7,6 @@ use App\Model\Evaluacion;
 use App\Model\LogCambioNota;
 use App\Model\Area;
 use App\Model\Nivel;
-use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 
 class ReporteRepository
@@ -18,33 +17,27 @@ class ReporteRepository
             ->with(['competidor.persona', 'competidor.institucion'])
             ->orderBy('puesto')
             ->get()
-            ->map(function ($item) {
-                return [
-                    'puesto'      => $item->puesto,
-                    'medalla'     => $item->medalla,
-                    'nombre'      => $this->nombreCompleto($item->competidor->persona),
-                    'institucion' => $item->competidor->institucion->nombre,
-                ];
-            });
+            ->map(fn ($item) => [
+                'puesto'      => $item->puesto,
+                'medalla'     => $item->medalla,
+                'nombre'      => $this->nombreCompleto($item->competidor->persona),
+                'institucion' => $item->competidor->institucion->nombre,
+            ]);
     }
 
     public function getClasificados(int $idCompetencia)
     {
-        return Evaluacion::whereHas('examen', function ($q) use ($idCompetencia) {
-                $q->where('id_competencia', $idCompetencia);
-            })
+        return Evaluacion::whereHas('examen', fn ($q) => $q->where('id_competencia', $idCompetencia))
             ->where('resultado_calculado', 'CLASIFICADO')
             ->with(['competidor.persona', 'competidor.institucion', 'examen'])
             ->get()
-            ->map(function ($item) {
-                return [
-                    'examen'      => $item->examen->nombre,
-                    'nombre'      => $this->nombreCompleto($item->competidor->persona),
-                    'institucion' => $item->competidor->institucion->nombre,
-                    'nota'        => $item->nota,
-                    'resultado'   => $item->resultado_calculado,
-                ];
-            });
+            ->map(fn ($item) => [
+                'examen'      => $item->examen->nombre,
+                'nombre'      => $this->nombreCompleto($item->competidor->persona),
+                'institucion' => $item->competidor->institucion->nombre,
+                'nota'        => $item->nota,
+                'resultado'   => $item->resultado_calculado,
+            ]);
     }
 
     public function getLogCambios(int $idEvaluacion)
@@ -53,24 +46,17 @@ class ReporteRepository
             ->with('autor.persona')
             ->orderByDesc('fecha_cambio')
             ->get()
-            ->map(function ($log) {
-                return [
-                    'fecha'         => $log->fecha_cambio->format('d/m/Y H:i'),
-                    'autor'         => $this->nombreCompleto($log->autor->persona),
-                    'nota_anterior' => $log->nota_anterior,
-                    'nota_nueva'    => $log->nota_nueva,
-                    'motivo'        => $log->motivo_cambio,
-                ];
-            });
+            ->map(fn ($log) => [
+                'fecha'         => $log->fecha_cambio->format('d/m/Y H:i'),
+                'autor'         => $this->nombreCompleto($log->autor->persona),
+                'nota_anterior' => $log->nota_anterior,
+                'nota_nueva'    => $log->nota_nueva,
+                'motivo'        => $log->motivo_cambio,
+            ]);
     }
 
     public function getHistorialCompleto(int $page, int $limit, array $filtros): array
     {
-        /*
-         * Eager loading reducido: se eliminó areaOlimpiada.olimpiada del with()
-         * porque solo se usa en el whereHas de filtro, no en el mapeo de resultados.
-         * Esto reduce la cadena de joins de 7 a 6 niveles máximo.
-         */
         $query = LogCambioNota::query()
             ->with([
                 'autor.persona',
@@ -79,34 +65,22 @@ class ReporteRepository
                 'evaluacion.competidor.gradoEscolaridad',
                 'evaluacion.examen.competencia.areaNivel.area',
                 'evaluacion.examen.competencia.areaNivel.nivel',
-            ]);
-
-        // Filtro de olimpiada activa (solo para whereHas, no necesita eager load)
-        $query->whereHas('evaluacion.examen.competencia.areaNivel.areaOlimpiada.olimpiada', function ($q) {
-            $q->where('estado', true);
-        });
+            ])
+            ->whereHas('evaluacion.examen.competencia.areaNivel.areaOlimpiada.olimpiada', fn ($q) => $q->where('estado', true));
 
         if (!empty($filtros['id_area'])) {
-            $query->whereHas('evaluacion.examen.competencia.areaNivel', function ($q) use ($filtros) {
+            $query->whereHas('evaluacion.examen.competencia.areaNivel.areaOlimpiada', function ($q) use ($filtros) {
                 $q->where('id_area', $filtros['id_area']);
             });
         }
 
         if (!empty($filtros['ids_niveles'])) {
             $ids = is_array($filtros['ids_niveles']) ? $filtros['ids_niveles'] : explode(',', $filtros['ids_niveles']);
-
-            $query->whereHas('evaluacion.examen.competencia.areaNivel', function ($q) use ($ids) {
-                $q->whereIn('id_nivel', $ids);
-            });
+            $query->whereHas('evaluacion.examen.competencia.areaNivel', fn ($q) => $q->whereIn('id_nivel', $ids));
         }
 
         if (!empty($filtros['search'])) {
             $term = $filtros['search'];
-            /*
-             * Se reemplaza CONCAT(nombre, ' ', apellido) por condiciones separadas
-             * sobre cada columna. El CONCAT impedía el uso de índices (full table scan).
-             * Con columnas separadas, el motor puede usar índices en nombre y apellido.
-             */
             $query->where(function ($subQ) use ($term) {
                 $subQ->whereHas('autor.persona', function ($q) use ($term) {
                     $q->where('nombre', 'LIKE', "%{$term}%")
@@ -119,13 +93,11 @@ class ReporteRepository
             });
         }
 
-        $query->orderBy('fecha_cambio', 'desc');
-
-        $paginator = $query->paginate($limit, ['*'], 'page', $page);
+        $paginator = $query->orderByDesc('fecha_cambio')->paginate($limit, ['*'], 'page', $page);
 
         $items = $paginator->getCollection()->map(function ($log) {
-            $compData = $log->evaluacion->examen->competencia->areaNivel ?? null;
-            $diff = $log->nota_nueva - $log->nota_anterior;
+            $areaNivel = $log->evaluacion->examen->competencia->areaNivel ?? null;
+            $diff      = $log->nota_nueva - $log->nota_anterior;
             [$accion, $tipoCambio] = $this->determinarAccion($log->nota_anterior, $log->nota_nueva);
 
             return [
@@ -134,18 +106,18 @@ class ReporteRepository
                 'nombre_evaluador'  => $this->nombreCompleto($log->autor->persona ?? null),
                 'nombre_olimpista'  => $this->nombreCompleto($log->evaluacion->competidor->persona ?? null),
                 'institucion'       => $log->evaluacion->competidor->institucion->nombre ?? 'Sin Institución',
-                'area'              => $compData->area->nombre ?? 'N/A',
-                'nivel'             => $compData->nivel->nombre ?? 'N/A',
+                'area'              => $areaNivel->area->nombre ?? 'N/A',
+                'nivel'             => $areaNivel->nivel->nombre ?? 'N/A',
                 'grado_escolaridad' => $log->evaluacion->competidor->gradoEscolaridad->nombre ?? 'N/A',
-                'id_area'           => $compData->id_area ?? null,
-                'id_nivel'          => $compData->id_nivel ?? null,
+                'id_area'           => $areaNivel->id_area ?? null,
+                'id_nivel'          => $areaNivel->id_nivel ?? null,
                 'accion'            => $accion,
                 'tipo_cambio'       => $tipoCambio,
                 'nota_anterior'     => (float) $log->nota_anterior,
                 'nota_nueva'        => (float) $log->nota_nueva,
                 'diferencia'        => (float) $diff,
                 'observacion'       => $log->motivo_cambio,
-                'descripcion'       => $this->generarFrase($accion, $log->nota_anterior, $log->nota_nueva)
+                'descripcion'       => $this->generarFrase($accion, $log->nota_anterior, $log->nota_nueva),
             ];
         });
 
@@ -157,16 +129,13 @@ class ReporteRepository
                 'page'       => $paginator->currentPage(),
                 'limit'      => $paginator->perPage(),
                 'totalPages' => $paginator->lastPage(),
-            ]
+            ],
         ];
     }
 
     public function getAreasActivas()
     {
-        return Area::query()
-            ->whereHas('areaOlimpiadas.olimpiada', function ($q) {
-                $q->where('estado', true);
-            })
+        return Area::whereHas('areaOlimpiadas.olimpiada', fn ($q) => $q->where('estado', true))
             ->select('id_area', 'nombre')
             ->orderBy('nombre')
             ->get();
@@ -174,16 +143,15 @@ class ReporteRepository
 
     public function getNivelesActivosPorArea(int $idArea)
     {
-        return Nivel::query()
-            ->whereHas('areaNiveles', function ($q) use ($idArea) {
-                $q->where('id_area', $idArea)
-                ->whereHas('areaOlimpiada.olimpiada', function ($q2) {
-                    $q2->where('estado', true);
-                });
-            })
-            ->select('id_nivel', 'nombre')
-            ->orderBy('nombre')
-            ->get();
+        return Nivel::whereHas('areaNiveles', function ($q) use ($idArea) {
+            $q->whereHas('areaOlimpiada', function ($qAo) use ($idArea) {
+                $qAo->where('id_area', $idArea)
+                    ->whereHas('olimpiada', fn ($q2) => $q2->where('estado', true));
+            });
+        })
+        ->select('id_nivel', 'nombre')
+        ->orderBy('nombre')
+        ->get();
     }
 
     private function determinarAccion($ant, $nue): array
@@ -198,12 +166,12 @@ class ReporteRepository
         return $persona ? "{$persona->nombre} {$persona->apellido}" : 'Desconocido';
     }
 
-    private function generarFrase($accion, $ant, $nue): string
+    private function generarFrase(string $accion, $ant, $nue): string
     {
         return match ($accion) {
             'Calificar'     => "Calificación inicial asignada: {$nue} pts.",
             'Desclasificar' => "Participante desclasificado. Nota anulada.",
-            default         => "Nota modificada de {$ant} a {$nue} pts."
+            default         => "Nota modificada de {$ant} a {$nue} pts.",
         };
     }
 }

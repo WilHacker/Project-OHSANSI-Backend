@@ -201,11 +201,8 @@ Route::prefix('v1')->group(function () {
             Route::get('/', [OlimpiadaController::class, 'index']);
             Route::post('/', [OlimpiadaController::class, 'store']);
             Route::patch('/{id}/activar', [OlimpiadaController::class, 'activar']);
-            Route::put('/{id}/activar', [OlimpiadaController::class, 'activar']);
             Route::post('/admin', [OlimpiadaController::class, 'storeAdmin']);
         });
-
-        Route::get('olimpiadas/{identifier}/areas', [AreaOlimpiadaController::class, 'getAreasByOlimpiada']);
 
         /*
         |------------------------------------------------------------------
@@ -219,9 +216,8 @@ Route::prefix('v1')->group(function () {
         Route::post('/area', [AreaController::class, 'store']);
         Route::get('/areas/actuales', [AreaController::class, 'getActualesPlanas']);
 
-        Route::get('/area/{id_olimpiada}', [AreaOlimpiadaController::class, 'getAreasByOlimpiada']);
         Route::get('/area/gestion/{gestion}', [AreaOlimpiadaController::class, 'getAreasByGestion']);
-        Route::get('/areas-olimpiada/{id_olimpiada}', [AreaOlimpiadaController::class, 'getAreasByOlimpiada']);
+        Route::get('/area/{id_olimpiada}', [AreaOlimpiadaController::class, 'getAreasByOlimpiada']);
         Route::get('/areas-gestion', [AreaOlimpiadaController::class, 'getAreasGestionActual']);
         Route::get('/areas-nombres', [AreaOlimpiadaController::class, 'getNombresAreasGestionActual']);
 
@@ -230,32 +226,34 @@ Route::prefix('v1')->group(function () {
 
         /*
         |------------------------------------------------------------------
-        | ÁREA-NIVEL
+        | ÁREA-NIVEL y ÁREA-NIVEL-GRADO
+        | IMPORTANTE: rutas con segmentos literales SIEMPRE antes del
+        | wildcard /{id_olimpiada} para evitar que lo tape.
         |------------------------------------------------------------------
         */
-        Route::get('/area-nivel/show/{id}', [AreaNivelController::class, 'show']);
-        Route::get('/area-nivel/actuales', [AreaNivelController::class, 'getActuales']);
-        Route::get('/area-nivel/detalle', [AreaNivelController::class, 'getAllWithDetails']);
-        Route::get('/area-nivel/por-area/{id_area}', [AreaNivelController::class, 'getByArea']);
-        Route::get('/area-nivel/{id_olimpiada}', [AreaNivelController::class, 'getAreasConNivelesPorOlimpiada']);
-        Route::get('/area-nivel/gestion/{gestion}', [AreaNivelController::class, 'getAreasConNivelesPorGestion']);
-        Route::put('/area-nivel/{id}', [AreaNivelController::class, 'update']);
-        Route::put('/area-nivel/por-area/{id_area}', [AreaNivelController::class, 'updateByArea']);
-        Route::get('/area-nivel/olimpiada/{id_olimpiada}/area/{id_area}', [AreaNivelController::class, 'getNivelesPorAreaOlimpiada']);
 
-        /*
-        |------------------------------------------------------------------
-        | ÁREA-NIVEL-GRADO
-        |------------------------------------------------------------------
-        */
+        // Rutas exactas (sin wildcard de ID) — PRIMERO
         Route::get('/area-nivel', [AreaNivelGradoController::class, 'index']);
         Route::post('/area-nivel', [AreaNivelGradoController::class, 'store']);
+        Route::get('/area-nivel/actuales', [AreaNivelController::class, 'getActuales']);
+        Route::get('/area-nivel/detalle', [AreaNivelController::class, 'getAllWithDetails']);
         Route::get('/area-nivel/sim/simplificado', [AreaNivelGradoController::class, 'getAreasConNivelesSimplificado']);
+        Route::get('/areas-con-niveles', [AreaNivelGradoController::class, 'getAreasConNiveles']);
+        Route::get('/area-niveles/{id_area}', [AreaNivelGradoController::class, 'getByAreaAll']);
+        Route::post('/area-nivel/por-gestion', [AreaNivelGradoController::class, 'getByGestionAndAreas']);
+
+        // Rutas con primer segmento literal + wildcard — ANTES del wildcard solo
+        Route::get('/area-nivel/show/{id}', [AreaNivelController::class, 'show']);
+        Route::get('/area-nivel/por-area/{id_area}', [AreaNivelController::class, 'getByArea']);
+        Route::put('/area-nivel/por-area/{id_area}', [AreaNivelController::class, 'updateByArea']);
+        Route::get('/area-nivel/gestion/{gestion}', [AreaNivelController::class, 'getAreasConNivelesPorGestion']);
         Route::get('/area-nivel/gestion/{gestion}/area/{id_area}', [AreaNivelGradoController::class, 'getNivelesGradosByAreaAndGestion']);
         Route::post('/area-nivel/gestion/{gestion}/areas', [AreaNivelGradoController::class, 'getNivelesGradosByAreasAndGestion']);
-        Route::post('/area-nivel/por-gestion', [AreaNivelGradoController::class, 'getByGestionAndAreas']);
-        Route::get('/area-niveles/{id_area}', [AreaNivelGradoController::class, 'getByAreaAll']);
-        Route::get('/areas-con-niveles', [AreaNivelGradoController::class, 'getAreasConNiveles']);
+        Route::get('/area-nivel/olimpiada/{id_olimpiada}/area/{id_area}', [AreaNivelController::class, 'getNivelesPorAreaOlimpiada']);
+
+        // Wildcard general — AL FINAL para no tapar nada
+        Route::get('/area-nivel/{id_olimpiada}', [AreaNivelController::class, 'getAreasConNivelesPorOlimpiada']);
+        Route::put('/area-nivel/{id}', [AreaNivelController::class, 'update']);
 
         /*
         |------------------------------------------------------------------

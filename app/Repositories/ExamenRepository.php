@@ -3,6 +3,7 @@
 namespace App\Repositories;
 
 use App\Model\Examen;
+use App\Model\Evaluacion;
 use Illuminate\Database\Eloquent\Collection;
 
 class ExamenRepository
@@ -19,81 +20,52 @@ class ExamenRepository
 
     public function update(array $data, int $id): bool
     {
-        $examen = $this->find($id);
-        return $examen->update($data);
+        return $this->find($id)->update($data);
     }
 
     public function delete(int $id): bool
     {
-        $examen = $this->find($id);
-        return $examen->delete();
+        return (bool) $this->find($id)->delete();
     }
 
-    /**
-     * Obtiene los exámenes de un Área-Nivel específico.
-     * Retorna una estructura plana y limpia para el listado.
-     */
     public function getByAreaNivel(int $idAreaNivel): Collection
     {
-        return Examen::query()
-            ->select([
-                'id_examen',
-                'id_competencia',
-                'nombre',
-                'ponderacion',
-                'maxima_nota',
-                'fecha_hora_inicio',
-                'tipo_regla',
-                'configuracion_reglas',
-                'estado_ejecucion',
-                'fecha_inicio_real'
-            ])
-            ->whereHas('competencia', function ($q) use ($idAreaNivel) {
-                $q->where('id_area_nivel', $idAreaNivel)
-                  ->whereHas('areaNivel.areaOlimpiada.olimpiada', function ($qOlimpiada) {
-                      $qOlimpiada->where('estado', 1);
-                  });
-            })
-            ->get();
+        return Examen::select([
+            'id_examen', 'id_competencia', 'nombre', 'ponderacion', 'maxima_nota',
+            'fecha_hora_inicio', 'tipo_regla', 'configuracion_reglas', 'estado_ejecucion', 'fecha_inicio_real',
+        ])
+        ->whereHas('competencia', function ($q) use ($idAreaNivel) {
+            $q->where('id_area_nivel', $idAreaNivel)
+              ->whereHas('areaNivel.areaOlimpiada.olimpiada', fn ($qO) => $qO->where('estado', true));
+        })
+        ->get();
     }
 
     public function getSimpleByAreaNivel(int $idAreaNivel): Collection
     {
-        return Examen::query()
-            ->select('id_examen', 'nombre')
+        return Examen::select('id_examen', 'nombre')
             ->whereHas('competencia', function ($q) use ($idAreaNivel) {
                 $q->where('id_area_nivel', $idAreaNivel)
-                ->whereHas('areaNivel.areaOlimpiada.olimpiada', function ($qOlim) {
-                    $qOlim->where('estado', 1);
-                });
+                  ->whereHas('areaNivel.areaOlimpiada.olimpiada', fn ($qO) => $qO->where('estado', true));
             })
             ->get();
     }
 
     public function getCompetidoresDeExamen(int $idExamen): Collection
     {
-        return \App\Model\Evaluacion::where('id_examen', $idExamen)
+        return Evaluacion::where('id_examen', $idExamen)
             ->with([
                 'competidor.persona',
                 'competidor.gradoEscolaridad',
-                'usuarioBloqueo.persona'
+                'usuarioBloqueo.persona',
             ])
             ->get();
     }
 
-    /**
-     * Suma las ponderaciones de los exámenes de una competencia.
-     * @param int $competenciaId
-     * @param int|null $excludeId (Opcional) ID para excluir al editar (no sumarse a sí mismo)
-     */
     public function sumarPonderaciones(int $competenciaId, ?int $excludeId = null): float
     {
-        $query = \App\Model\Examen::where('id_competencia', $competenciaId);
-
-        if ($excludeId) {
-            $query->where('id_examen', '!=', $excludeId);
-        }
-
-        return (float) $query->sum('ponderacion');
+        return (float) Examen::where('id_competencia', $competenciaId)
+            ->when($excludeId, fn ($q) => $q->where('id_examen', '!=', $excludeId))
+            ->sum('ponderacion');
     }
 }

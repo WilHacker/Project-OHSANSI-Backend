@@ -20,6 +20,10 @@ class Medallero extends Model
         'medalla',
     ];
 
+    protected $casts = [
+        'puesto' => 'integer',
+    ];
+
     /**
      * Get the competidor that won the medal.
      */

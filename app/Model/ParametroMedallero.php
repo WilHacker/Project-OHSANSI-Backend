@@ -2,10 +2,13 @@
 
 namespace App\Model;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class ParametroMedallero extends Model
 {
+    use HasFactory;
+
     protected $table = 'param_medallero';
     protected $primaryKey = 'id_param_medallero';
     public $timestamps = true;

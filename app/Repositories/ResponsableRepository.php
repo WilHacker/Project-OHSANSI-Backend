@@ -37,7 +37,6 @@ class ResponsableRepository
             'id_persona' => $persona->id_persona,
             'email'      => $data['email'],
             'password'   => Hash::make($data['password']),
-            'estado'     => true,
         ]);
     }
 
@@ -170,8 +169,6 @@ class ResponsableRepository
             'ci'         => $usuario->persona->ci ?? '',
             'telefono'   => $usuario->persona->telefono ?? '',
             'email'      => $usuario->email,
-            'activo'     => (bool) $usuario->estado,
-
             'areas_asignadas' => $usuario->responsableAreas->map(function($ra) {
                 return [
                     'id_responsable_area' => $ra->id_responsable_area,

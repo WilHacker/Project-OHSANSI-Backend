@@ -18,6 +18,10 @@ class ArchivoCsv extends Model
         'fecha',
     ];
 
+    protected $casts = [
+        'fecha' => 'date',
+    ];
+
     public function competidores()
     {
         return $this->hasMany(Competidor::class, 'id_archivo_csv', 'id_archivo_csv');

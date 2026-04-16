@@ -64,8 +64,8 @@ class ListaResponsableAreaService
     return collect();
 }
 
-    public function getListaDepartamento(){
-    return $this->listaResponsableAreaRepository->getListaDepartamento();
+    public function getListaDepartamentos(){
+    return $this->listaResponsableAreaRepository->getListaDepartamentos();
     }
    public function getListaGeneros(): array
     {

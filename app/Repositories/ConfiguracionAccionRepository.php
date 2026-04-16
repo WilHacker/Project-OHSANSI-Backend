@@ -24,9 +24,9 @@ class ConfiguracionAccionRepository
         return ConfiguracionAccion::updateOrCreate($attributes, $values);
     }
 
-    public function updateStatus(int $id, bool $estado): void
+    public function updateStatus(int $id, bool $habilitada): void
     {
         ConfiguracionAccion::where('id_configuracion_accion', $id)
-            ->update(['habilitada' => $estado ? 1 : 0]);
+            ->update(['habilitada' => $habilitada]);
     }
 }
