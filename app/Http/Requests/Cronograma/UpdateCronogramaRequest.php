@@ -10,7 +10,7 @@ class UpdateCronogramaRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return true;
+        return $this->user()?->can('CRONOGRAMA') ?? false;
     }
 
     protected function prepareForValidation(): void

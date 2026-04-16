@@ -3,6 +3,7 @@
 namespace App\Repositories;
 
 use App\Model\Competencia;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
 
 class CompetenciaRepository
@@ -41,9 +42,16 @@ class CompetenciaRepository
         return $competencia->delete();
     }
 
-    public function getAll(): Collection
+    /**
+     * Lista paginada de competencias con sus relaciones principales.
+     *
+     * @param  int  $porPagina  Registros por página (predeterminado: 15)
+     */
+    public function getAll(int $porPagina = 15): LengthAwarePaginator
     {
-        return Competencia::with(['faseGlobal', 'areaNivel.areaOlimpiada.area', 'areaNivel.nivel'])->get();
+        return Competencia::with(['faseGlobal', 'areaNivel.areaOlimpiada.area', 'areaNivel.nivel'])
+            ->orderBy('fecha_inicio', 'desc')
+            ->paginate($porPagina);
     }
 
     /**

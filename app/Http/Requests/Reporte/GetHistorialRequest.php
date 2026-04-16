@@ -10,7 +10,7 @@ class GetHistorialRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return true;
+        return $this->user()?->can('REPORTES_CAMBIOS') ?? false;
     }
 
     public function rules(): array

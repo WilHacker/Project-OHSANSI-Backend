@@ -11,7 +11,7 @@ class StoreResponsableRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return true;
+        return $this->user()?->can('RESPONSABLES') ?? false;
     }
 
     public function rules(): array

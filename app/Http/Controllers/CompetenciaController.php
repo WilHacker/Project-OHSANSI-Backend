@@ -11,10 +11,10 @@ use App\Services\CompetenciaService;
 use App\Services\CierreCompetenciaService;
 use App\Repositories\CompetenciaRepository;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use App\Events\CompetenciaCreada;
 use App\Repositories\AreaRepository;
 use App\Repositories\FaseGlobalRepository;
-use Exception;
 
 class CompetenciaController extends Controller
 {
@@ -27,11 +27,14 @@ class CompetenciaController extends Controller
     ) {}
 
     /**
-     * Listar todas las competencias.
+     * Listar competencias paginadas.
+     *
+     * Query param: ?por_pagina=15 (predeterminado)
      */
-    public function index(): JsonResponse
+    public function index(Request $request): JsonResponse
     {
-        return response()->json($this->repository->getAll());
+        $porPagina = $request->integer('por_pagina', 15);
+        return response()->json($this->repository->getAll($porPagina));
     }
 
     /**
@@ -39,16 +42,13 @@ class CompetenciaController extends Controller
      */
     public function store(StoreCompetenciaRequest $request): JsonResponse
     {
-        try {
-            $competencia = $this->service->crear($request->validated());
-            broadcast(new CompetenciaCreada($competencia))->toOthers();
-            return response()->json([
-                'message' => 'Competencia creada exitosamente.',
-                'data' => $competencia
-            ], 201);
-        } catch (Exception $e) {
-            return response()->json(['error' => $e->getMessage()], 400);
-        }
+        $competencia = $this->service->crear($request->validated());
+        broadcast(new CompetenciaCreada($competencia))->toOthers();
+
+        return response()->json([
+            'message' => 'Competencia creada exitosamente.',
+            'data'    => $competencia,
+        ], 201);
     }
 
     /**
@@ -56,11 +56,13 @@ class CompetenciaController extends Controller
      */
     public function show(int $id): JsonResponse
     {
-        try {
-            return response()->json($this->repository->findWithFullHierarchy($id));
-        } catch (Exception $e) {
-            return response()->json(['message' => 'Competencia no encontrada'], 404);
+        $competencia = $this->repository->findWithFullHierarchy($id);
+
+        if (!$competencia) {
+            return response()->json(['mensaje' => 'Competencia no encontrada.'], 404);
         }
+
+        return response()->json($competencia);
     }
 
     /**
@@ -68,15 +70,12 @@ class CompetenciaController extends Controller
      */
     public function update(UpdateCompetenciaRequest $request, int $id): JsonResponse
     {
-        try {
-            $competencia = $this->service->actualizar($id, $request->validated());
-            return response()->json([
-                'message' => 'Competencia actualizada correctamente.',
-                'data' => $competencia
-            ]);
-        } catch (Exception $e) {
-            return response()->json(['error' => $e->getMessage()], 400);
-        }
+        $competencia = $this->service->actualizar($id, $request->validated());
+
+        return response()->json([
+            'message' => 'Competencia actualizada correctamente.',
+            'data'    => $competencia,
+        ]);
     }
 
     /**
@@ -84,12 +83,9 @@ class CompetenciaController extends Controller
      */
     public function destroy(int $id): JsonResponse
     {
-        try {
-            $this->service->eliminar($id);
-            return response()->json(['message' => 'Competencia eliminada correctamente.']);
-        } catch (Exception $e) {
-            return response()->json(['error' => $e->getMessage()], 400);
-        }
+        $this->service->eliminar($id);
+
+        return response()->json(['message' => 'Competencia eliminada correctamente.']);
     }
 
     /**
@@ -98,15 +94,12 @@ class CompetenciaController extends Controller
      */
     public function publicar(int $id): JsonResponse
     {
-        try {
-            $competencia = $this->service->publicar($id);
-            return response()->json([
-                'message' => 'Competencia publicada. Ahora es visible.',
-                'data' => $competencia
-            ]);
-        } catch (Exception $e) {
-            return response()->json(['error' => $e->getMessage()], 400);
-        }
+        $competencia = $this->service->publicar($id);
+
+        return response()->json([
+            'message' => 'Competencia publicada. Ahora es visible.',
+            'data'    => $competencia,
+        ]);
     }
 
     /**
@@ -115,15 +108,12 @@ class CompetenciaController extends Controller
      */
     public function iniciar(int $id): JsonResponse
     {
-        try {
-            $competencia = $this->service->iniciar($id);
-            return response()->json([
-                'message' => 'Competencia iniciada (En Proceso).',
-                'data' => $competencia
-            ]);
-        } catch (Exception $e) {
-            return response()->json(['error' => $e->getMessage()], 400);
-        }
+        $competencia = $this->service->iniciar($id);
+
+        return response()->json([
+            'message' => 'Competencia iniciada (En Proceso).',
+            'data'    => $competencia,
+        ]);
     }
 
     /**
@@ -132,40 +122,26 @@ class CompetenciaController extends Controller
      */
     public function cerrar(ConcluirCompetenciaRequest $request, int $id): JsonResponse
     {
-        try {
-            $competencia = $this->cierreService->concluirYCalcular($id);
+        $competencia = $this->cierreService->concluirYCalcular($id);
 
-            return response()->json([
-                'message' => 'Competencia concluida. Resultados calculados y medallas asignadas.',
-                'data' => $competencia
-            ]);
-        } catch (Exception $e) {
-            return response()->json(['error' => $e->getMessage()], 409);
-        }
+        return response()->json([
+            'message' => 'Competencia concluida. Resultados calculados y medallas asignadas.',
+            'data'    => $competencia,
+        ]);
     }
 
     /**
      * Avalar (Firma Digital).
-     * Congela los resultados para siempre. Requiere contraseña.
+     * Congela los resultados para siempre.
      */
     public function avalar(AvalarCompetenciaRequest $request, int $id): JsonResponse
     {
-        try {
-            $userId = $request->user() ? $request->user()->id_usuario : $request->input('user_id_simulado');
+        $competencia = $this->cierreService->avalar($id, auth()->id());
 
-            if (!$userId) {
-                return response()->json(['error' => 'No se pudo identificar al usuario firmante.'], 401);
-            }
-
-            $competencia = $this->cierreService->avalar($id, $userId);
-
-            return response()->json([
-                'message' => 'Resultados avalados oficialmente.',
-                'data' => $competencia
-            ]);
-        } catch (Exception $e) {
-            return response()->json(['error' => $e->getMessage()], 409);
-        }
+        return response()->json([
+            'message' => 'Resultados avalados oficialmente.',
+            'data'    => $competencia,
+        ]);
     }
 
     /**
@@ -173,48 +149,31 @@ class CompetenciaController extends Controller
      */
     public function indexPorResponsable(int $idResponsable, int $idArea): JsonResponse
     {
-        try {
-            $competencias = $this->repository->getByResponsableAndArea($idResponsable, $idArea);
-            return response()->json($competencias);
-        } catch (Exception $e) {
-            return response()->json(['error' => 'Error al cargar competencias: ' . $e->getMessage()], 500);
-        }
+        $competencias = $this->repository->getByResponsableAndArea($idResponsable, $idArea);
+
+        return response()->json($competencias);
     }
 
-    // Fases Clasificatorias Actuales
     public function fasesClasificatorias(): JsonResponse
     {
-        $fases = $this->faseRepo->getClasificatoriasActuales();
-        return response()->json($fases);
+        return response()->json($this->faseRepo->getClasificatoriasActuales());
     }
 
-    // Áreas del Responsable (Actuales)
     public function areasResponsable(int $idUsuario): JsonResponse
     {
-        $areas = $this->areaRepo->getByResponsableActual($idUsuario);
-        return response()->json($areas);
+        return response()->json($this->areaRepo->getByResponsableActual($idUsuario));
     }
 
     public function nivelesPorArea(int $idArea): JsonResponse
     {
-        try {
-            $niveles = $this->service->listarNivelesPorArea($idArea);
-            return response()->json($niveles);
-        } catch (Exception $e) {
-            return response()->json(['error' => $e->getMessage()], 500);
-        }
+        return response()->json($this->service->listarNivelesPorArea($idArea));
     }
 
     /**
-     * Endpoint para obtener Áreas y Niveles de competencias YA CREADAS.
+     * Áreas y Niveles de competencias ya creadas para un responsable.
      */
     public function areasNivelesCreados(int $idUsuario): JsonResponse
     {
-        try {
-            $data = $this->service->agruparAreasNivelesPorResponsable($idUsuario);
-            return response()->json($data);
-        } catch (Exception $e) {
-            return response()->json(['error' => $e->getMessage()], 500);
-        }
+        return response()->json($this->service->agruparAreasNivelesPorResponsable($idUsuario));
     }
 }

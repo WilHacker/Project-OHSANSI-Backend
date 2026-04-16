@@ -11,7 +11,7 @@ class StoreExamenRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return true;
+        return $this->user()?->can('EXAMENES') ?? false;
     }
 
     public function rules(): array

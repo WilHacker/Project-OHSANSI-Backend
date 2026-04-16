@@ -66,6 +66,11 @@ class ReporteRepository
 
     public function getHistorialCompleto(int $page, int $limit, array $filtros): array
     {
+        /*
+         * Eager loading reducido: se eliminó areaOlimpiada.olimpiada del with()
+         * porque solo se usa en el whereHas de filtro, no en el mapeo de resultados.
+         * Esto reduce la cadena de joins de 7 a 6 niveles máximo.
+         */
         $query = LogCambioNota::query()
             ->with([
                 'autor.persona',
@@ -74,9 +79,9 @@ class ReporteRepository
                 'evaluacion.competidor.gradoEscolaridad',
                 'evaluacion.examen.competencia.areaNivel.area',
                 'evaluacion.examen.competencia.areaNivel.nivel',
-                'evaluacion.examen.competencia.areaNivel.areaOlimpiada.olimpiada'
             ]);
 
+        // Filtro de olimpiada activa (solo para whereHas, no necesita eager load)
         $query->whereHas('evaluacion.examen.competencia.areaNivel.areaOlimpiada.olimpiada', function ($q) {
             $q->where('estado', true);
         });
@@ -86,6 +91,7 @@ class ReporteRepository
                 $q->where('id_area', $filtros['id_area']);
             });
         }
+
         if (!empty($filtros['ids_niveles'])) {
             $ids = is_array($filtros['ids_niveles']) ? $filtros['ids_niveles'] : explode(',', $filtros['ids_niveles']);
 
@@ -96,12 +102,19 @@ class ReporteRepository
 
         if (!empty($filtros['search'])) {
             $term = $filtros['search'];
+            /*
+             * Se reemplaza CONCAT(nombre, ' ', apellido) por condiciones separadas
+             * sobre cada columna. El CONCAT impedía el uso de índices (full table scan).
+             * Con columnas separadas, el motor puede usar índices en nombre y apellido.
+             */
             $query->where(function ($subQ) use ($term) {
                 $subQ->whereHas('autor.persona', function ($q) use ($term) {
-                    $q->where(DB::raw("CONCAT(nombre, ' ', apellido)"), 'LIKE', "%{$term}%");
+                    $q->where('nombre', 'LIKE', "%{$term}%")
+                      ->orWhere('apellido', 'LIKE', "%{$term}%");
                 })
                 ->orWhereHas('evaluacion.competidor.persona', function ($q) use ($term) {
-                    $q->where(DB::raw("CONCAT(nombre, ' ', apellido)"), 'LIKE', "%{$term}%");
+                    $q->where('nombre', 'LIKE', "%{$term}%")
+                      ->orWhere('apellido', 'LIKE', "%{$term}%");
                 });
             });
         }

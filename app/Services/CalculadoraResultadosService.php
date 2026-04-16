@@ -2,19 +2,21 @@
 
 namespace App\Services;
 
+use App\Model\Evaluacion;
 use App\Model\Examen;
 use App\Model\Parametro;
-use Illuminate\Support\Facades\Log;
 
 class CalculadoraResultadosService
 {
     /**
-     * Punto de entrada: Ejecuta el cálculo automático al cerrar un examen.
-     * * @param Examen $examen
+     * Punto de entrada: ejecuta el cálculo automático al cerrar un examen.
+     *
+     * El $examen debe llegar con 'evaluaciones' y 'competencia' ya cargados
+     * para evitar queries adicionales.
      */
     public function procesarResultados(Examen $examen): void
     {
-        if ($examen->evaluaciones()->doesntExist()) {
+        if ($examen->evaluaciones->isEmpty()) {
             return;
         }
 
@@ -26,47 +28,83 @@ class CalculadoraResultadosService
 
     /**
      * ESTRATEGIA: Nota de Corte (Filtro).
-     * Determina si el estudiante "CLASIFICADO" o "NO CLASIFICADO" en este examen.
+     *
+     * Clasifica a cada competidor como CLASIFICADO o NO CLASIFICADO
+     * según si supera la nota mínima. Ejecuta un solo UPDATE por lote
+     * en lugar de N queries individuales.
      */
     private function aplicarNotaCorte(Examen $examen): void
     {
         $notaMinima = $this->obtenerNotaMinima($examen);
 
+        // Acumulamos los resultados para actualizar en un solo batch
+        $resultados = [];
+
         foreach ($examen->evaluaciones as $evaluacion) {
+            $resultado = match ($evaluacion->estado_participacion) {
+                'ausente'             => 'REPROBADO (Ausente)',
+                'descalificado_etica' => 'DESCALIFICADO',
+                'presente'            => ($evaluacion->nota >= $notaMinima) ? 'CLASIFICADO' : 'NO CLASIFICADO',
+                default               => 'NO CLASIFICADO',
+            };
 
-            if ($evaluacion->estado_participacion !== 'presente') {
-                $estado = match($evaluacion->estado_participacion) {
-                    'ausente' => 'REPROBADO (Ausente)',
-                    'descalificado_etica' => 'DESCALIFICADO',
-                    default => 'NO CLASIFICADO'
-                };
-
-                $evaluacion->update(['resultado_calculado' => $estado]);
-                continue;
-            }
-
-            $resultado = ($evaluacion->nota >= $notaMinima) ? 'CLASIFICADO' : 'NO CLASIFICADO';
-
-            $evaluacion->update(['resultado_calculado' => $resultado]);
+            $resultados[] = [
+                'id_evaluacion'      => $evaluacion->id_evaluacion,
+                'resultado_calculado' => $resultado,
+            ];
         }
+
+        $this->actualizarResultadosEnLote($resultados);
     }
 
     /**
      * Lógica por defecto para exámenes sumativos (sin regla de corte).
-     * Solo limpia el campo de resultado.
+     * Marca como COMPLETADO a los presentes en un solo batch.
      */
     private function logicaPorDefecto(Examen $examen): void
     {
+        $resultados = [];
+
         foreach ($examen->evaluaciones as $evaluacion) {
             if ($evaluacion->estado_participacion === 'presente') {
-                $evaluacion->update(['resultado_calculado' => 'COMPLETADO']);
+                $resultados[] = [
+                    'id_evaluacion'      => $evaluacion->id_evaluacion,
+                    'resultado_calculado' => 'COMPLETADO',
+                ];
             }
         }
+
+        $this->actualizarResultadosEnLote($resultados);
     }
 
     /**
-     * Helper: Obtiene la nota mínima priorizando la configuración local (JSON)
-     * y cayendo en la configuración global (Tabla Parametro) si no existe.
+     * Actualiza resultado_calculado en un solo batch usando upsert.
+     *
+     * Reemplaza el antipatrón de llamar $evaluacion->update() N veces
+     * en un loop. Ahora se emite una sola consulta SQL por bloque.
+     *
+     * @param  array<int, array{id_evaluacion: int, resultado_calculado: string}>  $resultados
+     */
+    private function actualizarResultadosEnLote(array $resultados): void
+    {
+        if (empty($resultados)) {
+            return;
+        }
+
+        Evaluacion::upsert(
+            $resultados,
+            uniqueBy: ['id_evaluacion'],
+            update: ['resultado_calculado']
+        );
+    }
+
+    /**
+     * Obtiene la nota mínima priorizando:
+     * 1. Configuración local del examen (JSON configuracion_reglas).
+     * 2. Parámetro global de la olimpiada para el área-nivel.
+     * 3. Valor predeterminado: 51.0
+     *
+     * Asume que $examen->competencia ya está cargado (eager loading).
      */
     private function obtenerNotaMinima(Examen $examen): float
     {

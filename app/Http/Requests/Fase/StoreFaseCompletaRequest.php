@@ -10,7 +10,7 @@ class StoreFaseCompletaRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return true;
+        return $this->user()?->can('ACTIVIDADES_FASES') ?? false;
     }
 
     public function rules(): array

@@ -6,23 +6,17 @@ use Illuminate\Foundation\Http\FormRequest;
 
 class BloquearFichaRequest extends FormRequest
 {
+    /**
+     * La autorización real se valida en el Service (si el juez está asignado al área/nivel).
+     * El middleware auth:sanctum ya garantiza que el usuario existe y está autenticado.
+     */
     public function authorize(): bool
     {
-        return true;
+        return $this->user() !== null;
     }
 
     public function rules(): array
     {
-        return [
-            'user_id' => ['required', 'integer', 'exists:usuario,id_usuario'],
-        ];
-    }
-
-    public function messages(): array
-    {
-        return [
-            'user_id.required' => 'Error de seguridad: No se pudo identificar al juez solicitante.',
-            'user_id.exists'   => 'El usuario evaluador no existe en la base de datos.',
-        ];
+        return [];
     }
 }

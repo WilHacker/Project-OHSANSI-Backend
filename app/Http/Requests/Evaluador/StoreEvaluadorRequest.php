@@ -11,7 +11,7 @@ class StoreEvaluadorRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return true;
+        return $this->user()?->can('EVALUADORES') ?? false;
     }
 
     public function rules(): array

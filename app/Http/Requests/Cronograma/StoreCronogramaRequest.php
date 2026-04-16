@@ -8,7 +8,7 @@ class StoreCronogramaRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return true;
+        return $this->user()?->can('CRONOGRAMA') ?? false;
     }
 
     public function rules(): array

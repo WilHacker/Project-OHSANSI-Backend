@@ -8,7 +8,7 @@ class ImportarRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return true;
+        return $this->user()?->can('INSCRIPCION') ?? false;
     }
 
     public function rules(): array

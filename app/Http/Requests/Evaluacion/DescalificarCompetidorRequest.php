@@ -6,20 +6,23 @@ use Illuminate\Foundation\Http\FormRequest;
 
 class DescalificarCompetidorRequest extends FormRequest
 {
-    public function authorize(): bool { return true; }
+    public function authorize(): bool
+    {
+        return $this->user() !== null;
+    }
 
     public function rules(): array
     {
         return [
-            'user_id' => ['required', 'integer', 'exists:usuario,id_usuario'],
-            'motivo'  => ['required', 'string', 'min:5', 'max:255'],
+            'motivo' => ['required', 'string', 'min:5', 'max:255'],
         ];
     }
 
     public function messages(): array
     {
         return [
-            'motivo.required' => 'Debe indicar el motivo de la descalificación (Ej. Fraude, Conducta Antideportiva).',
+            'motivo.required' => 'Debe indicar el motivo de la descalificación.',
+            'motivo.min'      => 'El motivo debe tener al menos 5 caracteres.',
         ];
     }
 }

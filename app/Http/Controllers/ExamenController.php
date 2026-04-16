@@ -7,6 +7,7 @@ use App\Http\Requests\Examen\UpdateExamenRequest;
 use App\Services\ExamenService;
 use App\Model\Examen;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use App\Events\ExamenCreado;
 use Exception;
@@ -17,9 +18,19 @@ class ExamenController extends Controller
         protected ExamenService $service
     ) {}
 
-    public function index(int $competenciaId): JsonResponse
+    /**
+     * Listar exámenes de una competencia (paginado).
+     *
+     * Query param: ?por_pagina=15 (predeterminado)
+     */
+    public function index(Request $request, int $competenciaId): JsonResponse
     {
-        $examenes = Examen::where('id_competencia', $competenciaId)->get();
+        $porPagina = $request->integer('por_pagina', 15);
+
+        $examenes = Examen::where('id_competencia', $competenciaId)
+            ->orderBy('created_at', 'desc')
+            ->paginate($porPagina);
+
         return response()->json($examenes);
     }
 

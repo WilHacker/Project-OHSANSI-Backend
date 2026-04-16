@@ -10,7 +10,7 @@ class StoreCompetenciaRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return true;
+        return $this->user()?->can('COMPETENCIAS') ?? false;
     }
 
     public function rules(): array

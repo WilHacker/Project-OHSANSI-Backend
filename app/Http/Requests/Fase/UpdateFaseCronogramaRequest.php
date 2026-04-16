@@ -9,7 +9,7 @@ class UpdateFaseCronogramaRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return true;
+        return $this->user()?->can('ACTIVIDADES_FASES') ?? false;
     }
 
     protected function prepareForValidation(): void
