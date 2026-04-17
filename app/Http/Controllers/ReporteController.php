@@ -6,6 +6,7 @@ use Illuminate\Routing\Controller;
 use App\Http\Requests\Reporte\GetHistorialRequest;
 use App\Services\ReporteService;
 use Illuminate\Http\JsonResponse;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class ReporteController extends Controller
 {
@@ -40,8 +41,23 @@ class ReporteController extends Controller
         return response()->json($this->reporteService->obtenerResultadosOficiales($idCompetencia));
     }
 
-    public function exportarGanadores(int $idCompetencia): JsonResponse
+    public function exportarCertificados(int $idCompetencia): BinaryFileResponse
     {
-        return response()->json(['message' => 'Funcionalidad de exportación PDF pendiente de implementación.']);
+        return $this->reporteService->exportarCertificados($idCompetencia);
+    }
+
+    public function exportarCeremonia(int $idCompetencia): BinaryFileResponse
+    {
+        return $this->reporteService->exportarCeremonia($idCompetencia);
+    }
+
+    public function exportarPublicacion(int $idCompetencia): BinaryFileResponse
+    {
+        return $this->reporteService->exportarPublicacion($idCompetencia);
+    }
+
+    public function exportarClasificados(int $idCompetencia): BinaryFileResponse
+    {
+        return $this->reporteService->exportarClasificados($idCompetencia);
     }
 }

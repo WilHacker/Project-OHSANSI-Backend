@@ -7,7 +7,10 @@ use App\Models\Evaluacion;
 use App\Models\LogCambioNota;
 use App\Models\Area;
 use App\Models\Nivel;
+use App\Models\Competencia;
+use App\Models\ResponsableArea;
 use Carbon\Carbon;
+use Illuminate\Support\Collection;
 
 class ReporteRepository
 {
@@ -152,6 +155,87 @@ class ReporteRepository
         ->select('id_nivel', 'nombre')
         ->orderBy('nombre')
         ->get();
+    }
+
+    public function getDatosExportMedallero(int $idCompetencia): Collection
+    {
+        $competencia = Competencia::with([
+            'areaNivel.areaOlimpiada.area',
+            'areaNivel.nivel',
+            'areaNivel.areaOlimpiada',
+        ])->findOrFail($idCompetencia);
+
+        $areaNivel   = $competencia->areaNivel;
+        $areaNombre  = $areaNivel?->areaOlimpiada?->area?->nombre ?? 'N/A';
+        $nivelNombre = $areaNivel?->nivel?->nombre ?? 'N/A';
+
+        $responsableNombre = $this->obtenerNombreResponsable(
+            $areaNivel?->id_area_olimpiada ?? 0
+        );
+
+        return Medallero::where('id_competencia', $idCompetencia)
+            ->with([
+                'competidor.persona',
+                'competidor.institucion',
+                'competidor.departamento',
+            ])
+            ->orderBy('puesto')
+            ->get()
+            ->map(fn ($item) => [
+                'nombre_completo'  => $this->nombreCompleto($item->competidor?->persona),
+                'unidad_educativa' => $item->competidor?->institucion?->nombre ?? '',
+                'departamento'     => $item->competidor?->departamento?->nombre ?? '',
+                'area'             => $areaNombre,
+                'nivel'            => $nivelNombre,
+                'nota'             => (float) ($item->competidor?->evaluaciones
+                    ->where('id_examen', fn ($e) => true)->first()?->nota ?? 0),
+                'posicion'         => $item->puesto,
+                'medalla'          => $item->medalla,
+                'tutor_academico'  => $item->competidor?->tutor_academico ?? '',
+                'responsable_area' => $responsableNombre,
+            ]);
+    }
+
+    public function getDatosExportClasificados(int $idCompetencia): Collection
+    {
+        $competencia = Competencia::with([
+            'areaNivel.areaOlimpiada.area',
+            'areaNivel.nivel',
+        ])->findOrFail($idCompetencia);
+
+        $areaNivel   = $competencia->areaNivel;
+        $areaNombre  = $areaNivel?->areaOlimpiada?->area?->nombre ?? 'N/A';
+        $nivelNombre = $areaNivel?->nivel?->nombre ?? 'N/A';
+
+        return Evaluacion::whereHas('examen', fn ($q) => $q->where('id_competencia', $idCompetencia))
+            ->with([
+                'competidor.persona',
+                'competidor.institucion',
+                'competidor.departamento',
+            ])
+            ->get()
+            ->map(fn ($item) => [
+                'nombre_completo' => $this->nombreCompleto($item->competidor?->persona),
+                'institucion'     => $item->competidor?->institucion?->nombre ?? '',
+                'departamento'    => $item->competidor?->departamento?->nombre ?? '',
+                'area'            => $areaNombre,
+                'nivel'           => $nivelNombre,
+                'nota'            => (float) $item->nota,
+                'resultado'       => $item->resultado_calculado ?? '',
+                'observacion'     => $item->observacion ?? '',
+            ])
+            ->sortByDesc('nota')
+            ->values();
+    }
+
+    private function obtenerNombreResponsable(int $idAreaOlimpiada): string
+    {
+        $responsable = ResponsableArea::where('id_area_olimpiada', $idAreaOlimpiada)
+            ->with('usuario.persona')
+            ->latest()
+            ->first();
+
+        return $this->nombreCompleto($responsable?->usuario?->persona);
     }
 
     private function determinarAccion($ant, $nue): array

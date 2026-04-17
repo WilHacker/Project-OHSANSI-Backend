@@ -68,6 +68,7 @@ class Competidor extends Model
         'id_persona',
         'id_grado_escolaridad',
         'contacto_tutor',
+        'tutor_academico',
         'genero',
         'estado_evaluacion',
     ];

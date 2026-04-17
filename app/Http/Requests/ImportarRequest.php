@@ -26,7 +26,8 @@ class ImportarRequest extends FormRequest
 
             'competidores.*.competidor.grado_escolar' => ['required', 'string'],
             'competidores.*.competidor.departamento' => ['required', 'string'],
-            'competidores.*.competidor.contacto_tutor' => ['nullable', 'string'],
+            'competidores.*.competidor.contacto_tutor'  => ['nullable', 'string'],
+            'competidores.*.competidor.tutor_academico' => ['nullable', 'string', 'max:255'],
 
             'competidores.*.institucion.nombre' => ['required', 'string'],
             'competidores.*.area.nombre' => ['required', 'string'],

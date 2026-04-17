@@ -180,6 +180,7 @@ class CompetidorService
                         'id_grupo'             => $idGrupo,
                         'id_archivo_csv'       => $archivoCsvId,
                         'contacto_tutor'       => $compData['contacto_tutor'] ?? null,
+                        'tutor_academico'      => $compData['tutor_academico'] ?? null,
                         'genero'               => $personaData['genero'],
                         'estado_evaluacion'    => 'disponible',
                     ]);

@@ -305,6 +305,10 @@ Route::prefix('v1')->group(function () {
             Route::get('/evaluacion/{id}/historial', 'historialCambios');
             Route::get('/areas', 'getAreas');
             Route::get('/areas/{idArea}/niveles', 'getNivelesPorArea');
+            Route::get('/competencia/{id}/exportar/certificados', 'exportarCertificados');
+            Route::get('/competencia/{id}/exportar/ceremonia', 'exportarCeremonia');
+            Route::get('/competencia/{id}/exportar/publicacion', 'exportarPublicacion');
+            Route::get('/competencia/{id}/exportar/clasificados', 'exportarClasificados');
         });
 
         /*
