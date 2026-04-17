@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Cache;
 
 class Departamento extends Model
 {
@@ -18,5 +19,11 @@ class Departamento extends Model
     public function competidores()
     {
         return $this->hasMany(Competidor::class, 'id_departamento');
+    }
+
+    protected static function booted(): void
+    {
+        static::saved(fn () => Cache::forget('catalogo_departamentos'));
+        static::deleted(fn () => Cache::forget('catalogo_departamentos'));
     }
 }

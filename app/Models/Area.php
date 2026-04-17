@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Cache;
 
 class Area extends Model
 {
@@ -26,5 +27,18 @@ class Area extends Model
     public function areaOlimpiadas()
     {
         return $this->hasMany(AreaOlimpiada::class, 'id_area', 'id_area');
+    }
+
+    protected static function booted(): void
+    {
+        // Se ejecuta al Crear o Actualizar
+        static::saved(function () {
+            Cache::forget('catalogo_areas');
+        });
+
+        // Se ejecuta al Eliminar
+        static::deleted(function () {
+            Cache::forget('catalogo_areas');
+        });
     }
 }

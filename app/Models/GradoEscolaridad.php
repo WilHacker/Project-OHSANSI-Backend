@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Cache;
 
 class GradoEscolaridad extends Model
 {
@@ -28,5 +29,11 @@ class GradoEscolaridad extends Model
     public function competidores()
     {
         return $this->hasMany(Competidor::class, 'id_grado_escolaridad');
+    }
+
+    protected static function booted(): void
+    {
+        static::saved(fn () => Cache::forget('catalogo_grados'));
+        static::deleted(fn () => Cache::forget('catalogo_grados'));
     }
 }

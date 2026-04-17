@@ -13,6 +13,7 @@ use App\Models\DescalificacionAdministrativa;
 use App\Models\AreaOlimpiada;
 use App\Models\AreaNivel;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Facades\Cache;
 
 class CompetidorRepository
 {
@@ -34,15 +35,31 @@ class CompetidorRepository
             ->get();
     }
 
-    public function getInstitucionesByNombres(array $nombres): Collection
+    public function getAllInstituciones(): Collection
     {
-        return Institucion::whereIn('nombre', $nombres)->get();
+        return Cache::remember('catalogo_instituciones', 86400, fn() => Institucion::all());
     }
 
-    public function getAllDepartamentos(): Collection { return Departamento::all(); }
-    public function getAllGrados(): Collection { return GradoEscolaridad::all(); }
-    public function getAllAreas(): Collection { return Area::all(); }
-    public function getAllNiveles(): Collection { return Nivel::all(); }
+    public function getInstitucionesByNombres(array $nombres): Collection
+    {
+        return $this->getAllInstituciones()->whereIn('nombre', $nombres);
+    }
+
+    public function getAllDepartamentos(): Collection {
+        return Cache::remember('catalogo_departamentos', 86400, fn() => Departamento::all());
+    }
+
+    public function getAllGrados(): Collection {
+        return Cache::remember('catalogo_grados', 86400, fn() => GradoEscolaridad::all());
+    }
+
+    public function getAllAreas(): Collection {
+        return Cache::remember('catalogo_areas', 86400, fn() => Area::all());
+    }
+
+    public function getAllNiveles(): Collection {
+        return Cache::remember('catalogo_niveles', 86400, fn() => Nivel::all());
+    }
 
     public function getAreaOlimpiadas(int $olimpiadaId): Collection
     {
