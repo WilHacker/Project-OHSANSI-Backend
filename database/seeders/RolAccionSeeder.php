@@ -3,9 +3,9 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use App\Model\RolAccion;
-use App\Model\AccionSistema;
-use App\Model\Rol;
+use App\Models\RolAccion;
+use App\Models\AccionSistema;
+use App\Models\Rol;
 
 class RolAccionSeeder extends Seeder
 {

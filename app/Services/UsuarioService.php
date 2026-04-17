@@ -4,7 +4,7 @@ namespace App\Services;
 
 use App\Repositories\UsuarioRepository;
 use Illuminate\Support\Facades\Hash;
-use App\Model\Olimpiada;
+use App\Models\Olimpiada;
 
 class UsuarioService
 {

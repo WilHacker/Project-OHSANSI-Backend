@@ -3,7 +3,7 @@
 namespace App\Services;
 
 use App\Repositories\AreaOlimpiadaRepository;
-use App\Model\Olimpiada;
+use App\Models\Olimpiada;
 use Illuminate\Support\Collection;
 
 class AreaOlimpiadaService

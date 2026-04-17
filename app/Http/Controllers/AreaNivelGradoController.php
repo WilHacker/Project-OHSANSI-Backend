@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
-use App\Model\Olimpiada;
+use App\Models\Olimpiada;
 use App\Services\AreaNivelGradoService;
 use Illuminate\Routing\Controller;
 

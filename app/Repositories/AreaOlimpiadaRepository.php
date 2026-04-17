@@ -2,7 +2,7 @@
 
 namespace App\Repositories;
 
-use App\Model\Area;
+use App\Models\Area;
 use Illuminate\Support\Collection;
 
 class AreaOlimpiadaRepository

@@ -2,7 +2,7 @@
 
 namespace App\Repositories;
 
-use App\Model\RolAccion;
+use App\Models\RolAccion;
 use Illuminate\Database\Eloquent\Collection;
 
 class RolAccionRepository

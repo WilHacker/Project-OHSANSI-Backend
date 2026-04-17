@@ -3,7 +3,7 @@
 namespace App\Http\Requests\Cronograma;
 
 use Illuminate\Foundation\Http\FormRequest;
-use App\Model\CronogramaFase;
+use App\Models\CronogramaFase;
 use Carbon\Carbon;
 
 class UpdateCronogramaRequest extends FormRequest

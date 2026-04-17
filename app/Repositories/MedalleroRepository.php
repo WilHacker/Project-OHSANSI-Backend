@@ -2,8 +2,8 @@
 
 namespace App\Repositories;
 
-use App\Model\Olimpiada;
-use App\Model\ParametroMedallero;
+use App\Models\Olimpiada;
+use App\Models\ParametroMedallero;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 

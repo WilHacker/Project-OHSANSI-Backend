@@ -2,7 +2,7 @@
 
 namespace App\Repositories;
 
-use App\Model\Nivel;
+use App\Models\Nivel;
 use Illuminate\Database\Eloquent\Collection;
 
 class NivelRepository

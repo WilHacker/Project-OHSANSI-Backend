@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Routing\Controller;
-use App\Model\ParametroMedallero;
+use App\Models\ParametroMedallero;
 use App\Services\MedalleroService;
 
 class MedalleroController extends Controller

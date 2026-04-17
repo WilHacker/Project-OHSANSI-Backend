@@ -5,16 +5,19 @@ namespace App\Http\Controllers;
 use App\Http\Requests\Examen\StoreExamenRequest;
 use App\Http\Requests\Examen\UpdateExamenRequest;
 use App\Services\ExamenService;
-use App\Model\Examen;
+use App\Repositories\ExamenRepository;
+use App\Models\Examen;
+use App\Events\ExamenCreado;
+use App\Events\ExamenEstadoCambiado;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
-use App\Events\ExamenCreado;
 
 class ExamenController extends Controller
 {
     public function __construct(
-        protected ExamenService $service
+        protected ExamenService $service,
+        protected ExamenRepository $repository
     ) {}
 
     /**
@@ -26,9 +29,7 @@ class ExamenController extends Controller
     {
         $porPagina = $request->integer('por_pagina', 15);
 
-        $examenes = Examen::where('id_competencia', $competenciaId)
-            ->orderBy('created_at', 'desc')
-            ->paginate($porPagina);
+        $examenes = $this->repository->paginadosPorCompetencia($competenciaId, $porPagina);
 
         return response()->json($examenes);
     }
@@ -49,9 +50,9 @@ class ExamenController extends Controller
     public function update(UpdateExamenRequest $request, int $id): JsonResponse
     {
         $examen = $this->service->actualizarExamen($id, $request->validated());
-        broadcast(new ExamenCreado($examen))->toOthers();
+        broadcast(new ExamenEstadoCambiado($examen, $examen->estado_ejecucion))->toOthers();
 
-        return response()->json(['message' => 'Actualizado.', 'data' => $examen]);
+        return response()->json(['mensaje' => 'Examen actualizado.', 'datos' => $examen]);
     }
 
     public function destroy(int $id): JsonResponse

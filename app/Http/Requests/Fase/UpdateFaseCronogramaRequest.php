@@ -3,7 +3,7 @@
 namespace App\Http\Requests\Fase;
 
 use Illuminate\Foundation\Http\FormRequest;
-use App\Model\FaseGlobal;
+use App\Models\FaseGlobal;
 
 class UpdateFaseCronogramaRequest extends FormRequest
 {

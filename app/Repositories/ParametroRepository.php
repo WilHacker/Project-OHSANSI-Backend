@@ -3,9 +3,9 @@
 namespace App\Repositories;
 
 use App\Exceptions\AppException;
-use App\Model\Parametro;
-use App\Model\AreaNivel;
-use App\Model\Olimpiada;
+use App\Models\Parametro;
+use App\Models\AreaNivel;
+use App\Models\Olimpiada;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 

@@ -2,7 +2,7 @@
 
 namespace App\Events;
 
-use App\Model\Examen;
+use App\Models\Examen;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PrivateChannel;

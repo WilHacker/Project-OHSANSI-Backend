@@ -3,7 +3,7 @@
 namespace App\Services;
 
 use App\Repositories\CronogramaFaseRepository;
-use App\Model\CronogramaFase;
+use App\Models\CronogramaFase;
 use Illuminate\Database\Eloquent\Collection;
 use App\Repositories\OlimpiadaRepository;
 use Illuminate\Validation\ValidationException;

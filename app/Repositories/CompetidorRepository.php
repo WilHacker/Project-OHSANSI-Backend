@@ -2,16 +2,16 @@
 
 namespace App\Repositories;
 
-use App\Model\Competidor;
-use App\Model\Persona;
-use App\Model\Institucion;
-use App\Model\Departamento;
-use App\Model\GradoEscolaridad;
-use App\Model\Area;
-use App\Model\Nivel;
-use App\Model\DescalificacionAdministrativa;
-use App\Model\AreaOlimpiada;
-use App\Model\AreaNivel;
+use App\Models\Competidor;
+use App\Models\Persona;
+use App\Models\Institucion;
+use App\Models\Departamento;
+use App\Models\GradoEscolaridad;
+use App\Models\Area;
+use App\Models\Nivel;
+use App\Models\DescalificacionAdministrativa;
+use App\Models\AreaOlimpiada;
+use App\Models\AreaNivel;
 use Illuminate\Database\Eloquent\Collection;
 
 class CompetidorRepository

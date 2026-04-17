@@ -3,10 +3,10 @@
 namespace Tests\Feature\Evaluacion;
 
 use Tests\TestCase;
-use App\Model\Usuario;
+use App\Models\Usuario;
 use App\Services\EvaluacionService;
-use App\Model\Evaluacion;
-use App\Model\Examen;
+use App\Models\Evaluacion;
+use App\Models\Examen;
 use App\Exceptions\Dominio\EvaluacionException;
 use App\Exceptions\Dominio\AutorizacionException;
 use Mockery;

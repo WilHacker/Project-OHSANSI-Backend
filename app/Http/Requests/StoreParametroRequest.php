@@ -3,8 +3,8 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
-use App\Model\Olimpiada;
-use App\Model\AreaNivel;
+use App\Models\Olimpiada;
+use App\Models\AreaNivel;
 
 class StoreParametroRequest extends FormRequest
 {

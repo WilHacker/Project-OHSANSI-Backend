@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use App\Model\Departamento;
+use App\Models\Departamento;
 use App\Repositories\DepartamentoRepository;
 use Illuminate\Database\Eloquent\Collection;
 use Exception;

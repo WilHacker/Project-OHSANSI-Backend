@@ -3,9 +3,9 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use App\Model\FaseGlobal;
-use App\Model\Olimpiada;
-use App\Model\CronogramaFase;
+use App\Models\FaseGlobal;
+use App\Models\Olimpiada;
+use App\Models\CronogramaFase;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 

@@ -3,7 +3,7 @@
 namespace App\Http\Requests\Evaluacion;
 
 use Illuminate\Foundation\Http\FormRequest;
-use App\Model\Evaluacion;
+use App\Models\Evaluacion;
 use Illuminate\Validation\Validator;
 
 class GuardarNotaRequest extends FormRequest

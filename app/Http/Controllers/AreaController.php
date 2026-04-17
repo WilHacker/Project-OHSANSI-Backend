@@ -6,8 +6,8 @@ use Illuminate\Http\Request;
 use App\Services\AreaService;
 use Illuminate\Routing\Controller;
 use Illuminate\Http\JsonResponse;
-use App\Model\AreaOlimpiada;
-use App\Model\Olimpiada;
+use App\Models\AreaOlimpiada;
+use App\Models\Olimpiada;
 
 class AreaController extends Controller
 {

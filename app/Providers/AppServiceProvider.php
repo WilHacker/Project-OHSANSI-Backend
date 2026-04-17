@@ -7,34 +7,34 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
 
+use App\Repositories\CompetenciaRepository;
+use App\Repositories\EvaluacionRepository;
+use App\Repositories\ExamenRepository;
+use App\Repositories\UsuarioRepository;
+use App\Repositories\Interfaces\CompetenciaRepositoryInterface;
+use App\Repositories\Interfaces\EvaluacionRepositoryInterface;
+use App\Repositories\Interfaces\ExamenRepositoryInterface;
+use App\Repositories\Interfaces\UsuarioRepositoryInterface;
+
 class AppServiceProvider extends ServiceProvider
 {
-    /**
-     * Registrar servicios en el contenedor.
-     */
     public function register(): void
     {
-        //
+        $this->app->bind(CompetenciaRepositoryInterface::class, CompetenciaRepository::class);
+        $this->app->bind(EvaluacionRepositoryInterface::class,  EvaluacionRepository::class);
+        $this->app->bind(ExamenRepositoryInterface::class,      ExamenRepository::class);
+        $this->app->bind(UsuarioRepositoryInterface::class,     UsuarioRepository::class);
     }
 
-    /**
-     * Arrancar servicios de la aplicación.
-     */
     public function boot(): void
     {
         $this->configurarLimitesDeVelocidad();
     }
 
-    /**
-     * Definir los limitadores de velocidad para la API.
-     *
-     * - login: protege contra ataques de fuerza bruta al endpoint de autenticación.
-     * - api: límite general para rutas autenticadas.
-     */
     private function configurarLimitesDeVelocidad(): void
     {
         RateLimiter::for('login', function (Request $request) {
-            $maxIntentos = (int) env('RATE_LIMIT_LOGIN', 10);
+            $maxIntentos = config('ohsansi.rate_limit.login', 10);
 
             return Limit::perMinute($maxIntentos)
                 ->by($request->ip())
@@ -46,7 +46,9 @@ class AppServiceProvider extends ServiceProvider
         });
 
         RateLimiter::for('api', function (Request $request) {
-            return Limit::perMinute(120)
+            $maxApi = config('ohsansi.rate_limit.api', 120);
+
+            return Limit::perMinute($maxApi)
                 ->by($request->user()?->id_usuario ?: $request->ip());
         });
     }

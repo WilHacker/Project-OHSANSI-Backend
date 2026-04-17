@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use App\Model\GradoEscolaridad;
+use App\Models\GradoEscolaridad;
 use App\Repositories\GradoEscolaridadRepository;
 use Illuminate\Database\Eloquent\Collection;
 use Exception;

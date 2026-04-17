@@ -3,8 +3,8 @@
 namespace App\Services;
 
 use App\Repositories\ResponsableRepository;
-use App\Model\Usuario;
-use App\Model\Olimpiada;
+use App\Models\Usuario;
+use App\Models\Olimpiada;
 use App\Mail\UserCredentialsMail;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;

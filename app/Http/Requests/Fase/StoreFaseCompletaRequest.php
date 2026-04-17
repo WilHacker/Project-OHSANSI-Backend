@@ -4,7 +4,7 @@ namespace App\Http\Requests\Fase;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
-use App\Model\Olimpiada;
+use App\Models\Olimpiada;
 
 class StoreFaseCompletaRequest extends FormRequest
 {

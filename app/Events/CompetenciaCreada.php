@@ -2,7 +2,7 @@
 
 namespace App\Events;
 
-use App\Model\Competencia;
+use App\Models\Competencia;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PrivateChannel;

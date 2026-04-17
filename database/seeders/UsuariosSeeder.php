@@ -4,10 +4,10 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
-use App\Model\Usuario;
-use App\Model\Persona;
-use App\Model\Rol;
-use App\Model\UsuarioRol;
+use App\Models\Usuario;
+use App\Models\Persona;
+use App\Models\Rol;
+use App\Models\UsuarioRol;
 
 class UsuariosSeeder extends Seeder
 {

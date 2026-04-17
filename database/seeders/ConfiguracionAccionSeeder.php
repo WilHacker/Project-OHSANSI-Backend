@@ -3,9 +3,9 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use App\Model\AccionSistema;
-use App\Model\FaseGlobal;
-use App\Model\ConfiguracionAccion;
+use App\Models\AccionSistema;
+use App\Models\FaseGlobal;
+use App\Models\ConfiguracionAccion;
 
 class ConfiguracionAccionSeeder extends Seeder
 {

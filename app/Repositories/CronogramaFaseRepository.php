@@ -2,7 +2,7 @@
 
 namespace App\Repositories;
 
-use App\Model\CronogramaFase;
+use App\Models\CronogramaFase;
 use Illuminate\Database\Eloquent\Collection;
 
 class CronogramaFaseRepository

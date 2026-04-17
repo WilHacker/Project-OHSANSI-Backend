@@ -5,8 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\JsonResponse;
 use App\Services\AreaNivelService;
 use Illuminate\Routing\Controller;
-use App\Model\AreaOlimpiada;
-use App\Model\AreaNivel;
+use App\Models\AreaOlimpiada;
+use App\Models\AreaNivel;
 
 class AreaNivelController extends Controller
 {
@@ -32,7 +32,7 @@ class AreaNivelController extends Controller
     public function destroy(int $id): JsonResponse
     {
         // No se puede eliminar si ya existe al menos una fase global configurada
-        if (\App\Model\FaseGlobal::exists()) {
+        if (\App\Models\FaseGlobal::exists()) {
             return response()->json([
                 'success' => false,
                 'message' => 'Se está en una fase de evaluación, por lo tanto no se pueden modificar los datos',

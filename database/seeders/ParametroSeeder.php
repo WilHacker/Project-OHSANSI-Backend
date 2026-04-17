@@ -3,9 +3,9 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use App\Model\Parametro;
-use App\Model\AreaNivel;
-use App\Model\Olimpiada;
+use App\Models\Parametro;
+use App\Models\AreaNivel;
+use App\Models\Olimpiada;
 
 class ParametroSeeder extends Seeder
 {

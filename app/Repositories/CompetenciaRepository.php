@@ -2,8 +2,8 @@
 
 namespace App\Repositories;
 
-use App\Model\Competencia;
-use App\Model\AreaNivel;
+use App\Models\Competencia;
+use App\Models\AreaNivel;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
 

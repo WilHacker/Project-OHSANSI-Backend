@@ -3,8 +3,8 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Routing\Controller;
-use App\Model\DescalificacionAdministrativa;
-use App\Model\Evaluacion;
+use App\Models\DescalificacionAdministrativa;
+use App\Models\Evaluacion;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Validator;

@@ -3,9 +3,9 @@
 namespace App\Services;
 
 use App\Repositories\CompetenciaRepository;
-use App\Model\Competencia;
-use App\Model\Medallero;
-use App\Model\ParametroMedallero;
+use App\Models\Competencia;
+use App\Models\Medallero;
+use App\Models\ParametroMedallero;
 use App\Events\CompetenciaFinalizada;
 use App\Events\CompetenciaEstadoCambiado;
 use Illuminate\Support\Facades\DB;
@@ -42,7 +42,7 @@ class CierreCompetenciaService
             $competencia->update(['estado_fase' => 'concluida']);
 
             broadcast(new CompetenciaFinalizada($competencia))->toOthers();
-            broadcast(new CompetenciaEstadoCambiado($competencia, 'publicada'))->toOthers();
+            broadcast(new CompetenciaEstadoCambiado($competencia, 'concluida'))->toOthers();
 
             return $competencia;
         });
@@ -147,9 +147,7 @@ class CierreCompetenciaService
             'fecha_aval' => now()
         ]);
 
-        // Opcional: Aquí podrías disparar un evento de 'CertificadosDisponibles'
-
-        broadcast(new CompetenciaEstadoCambiado($competencia, 'publicada'))->toOthers();
+        broadcast(new CompetenciaEstadoCambiado($competencia, 'avalada'))->toOthers();
 
         return $competencia;
     }

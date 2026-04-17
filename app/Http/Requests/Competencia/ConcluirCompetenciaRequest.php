@@ -3,7 +3,7 @@
 namespace App\Http\Requests\Competencia;
 
 use Illuminate\Foundation\Http\FormRequest;
-use App\Model\Competencia;
+use App\Models\Competencia;
 use Illuminate\Validation\Validator;
 
 class ConcluirCompetenciaRequest extends FormRequest

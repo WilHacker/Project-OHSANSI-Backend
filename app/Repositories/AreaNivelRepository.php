@@ -2,8 +2,8 @@
 
 namespace App\Repositories;
 
-use App\Model\AreaNivel;
-use App\Model\AreaOlimpiada;
+use App\Models\AreaNivel;
+use App\Models\AreaOlimpiada;
 use Illuminate\Database\Eloquent\Collection;
 
 class AreaNivelRepository

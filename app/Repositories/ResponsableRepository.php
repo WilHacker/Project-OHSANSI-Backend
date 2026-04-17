@@ -2,13 +2,13 @@
 
 namespace App\Repositories;
 
-use App\Model\Usuario;
-use App\Model\Persona;
-use App\Model\Rol;
-use App\Model\ResponsableArea;
-use App\Model\AreaOlimpiada;
-use App\Model\Area;
-use App\Model\Olimpiada;
+use App\Models\Usuario;
+use App\Models\Persona;
+use App\Models\Rol;
+use App\Models\ResponsableArea;
+use App\Models\AreaOlimpiada;
+use App\Models\Area;
+use App\Models\Olimpiada;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;

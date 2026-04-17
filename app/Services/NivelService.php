@@ -3,7 +3,7 @@
 namespace App\Services;
 
 use App\Repositories\NivelRepository;
-use App\Model\Nivel;
+use App\Models\Nivel;
 use Illuminate\Database\Eloquent\Collection;
 
 class NivelService {

@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Routing\Controller;
 use App\Http\Requests\StoreParametroRequest;
 use App\Services\ParametroService;
-use App\Model\Olimpiada;
+use App\Models\Olimpiada;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 

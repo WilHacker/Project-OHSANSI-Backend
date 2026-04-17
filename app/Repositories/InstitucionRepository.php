@@ -2,7 +2,7 @@
 
 namespace App\Repositories;
 
-use App\Model\Institucion;
+use App\Models\Institucion;
 use Illuminate\Database\Eloquent\Collection;
 
 class InstitucionRepository

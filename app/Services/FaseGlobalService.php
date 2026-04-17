@@ -2,9 +2,9 @@
 
 namespace App\Services;
 
-use App\Model\CronogramaFase;
-use App\Model\FaseGlobal;
-use App\Model\Olimpiada;
+use App\Models\CronogramaFase;
+use App\Models\FaseGlobal;
+use App\Models\Olimpiada;
 use App\Repositories\FaseGlobalRepository;
 use App\Services\SistemaEstadoService;
 use Illuminate\Support\Facades\DB;

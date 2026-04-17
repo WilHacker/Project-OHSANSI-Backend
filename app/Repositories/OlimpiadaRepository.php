@@ -2,7 +2,7 @@
 
 namespace App\Repositories;
 
-use App\Model\Olimpiada;
+use App\Models\Olimpiada;
 use Illuminate\Database\Eloquent\Collection;
 
 class OlimpiadaRepository

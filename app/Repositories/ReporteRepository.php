@@ -2,11 +2,11 @@
 
 namespace App\Repositories;
 
-use App\Model\Medallero;
-use App\Model\Evaluacion;
-use App\Model\LogCambioNota;
-use App\Model\Area;
-use App\Model\Nivel;
+use App\Models\Medallero;
+use App\Models\Evaluacion;
+use App\Models\LogCambioNota;
+use App\Models\Area;
+use App\Models\Nivel;
 use Carbon\Carbon;
 
 class ReporteRepository

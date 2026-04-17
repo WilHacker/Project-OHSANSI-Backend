@@ -2,8 +2,8 @@
 
 namespace App\Services;
 
-use App\Model\Area;
-use App\Model\Olimpiada;
+use App\Models\Area;
+use App\Models\Olimpiada;
 use App\Repositories\AreaRepository;
 use Illuminate\Support\Facades\Log;
 

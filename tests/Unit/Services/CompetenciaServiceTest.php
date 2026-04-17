@@ -6,7 +6,7 @@ use Tests\TestCase;
 use App\Services\CompetenciaService;
 use App\Repositories\CompetenciaRepository;
 use App\Repositories\UsuarioRepository;
-use App\Model\Competencia;
+use App\Models\Competencia;
 use App\Exceptions\Dominio\CompetenciaException;
 use App\Exceptions\Dominio\AutorizacionException;
 use Mockery;

@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Services\NivelService;
-use App\Model\Nivel;
+use App\Models\Nivel;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\DB;

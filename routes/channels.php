@@ -1,10 +1,10 @@
 <?php
 
-use App\Model\AreaNivel;
-use App\Model\Competencia;
-use App\Model\EvaluadorAn;
-use App\Model\Examen;
-use App\Model\ResponsableArea;
+use App\Models\AreaNivel;
+use App\Models\Competencia;
+use App\Models\EvaluadorAn;
+use App\Models\Examen;
+use App\Models\ResponsableArea;
 use Illuminate\Support\Facades\Broadcast;
 
 /*

@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use App\Model\Olimpiada;
+use App\Models\Olimpiada;
 use App\Repositories\OlimpiadaRepository;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;

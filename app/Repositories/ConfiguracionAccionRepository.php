@@ -2,7 +2,7 @@
 
 namespace App\Repositories;
 
-use App\Model\ConfiguracionAccion;
+use App\Models\ConfiguracionAccion;
 use Illuminate\Support\Collection;
 
 class ConfiguracionAccionRepository

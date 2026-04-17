@@ -2,7 +2,7 @@
 
 namespace App\Repositories;
 
-use App\Model\FaseGlobal;
+use App\Models\FaseGlobal;
 use Illuminate\Database\Eloquent\Collection;
 
 class FaseGlobalRepository

@@ -4,7 +4,7 @@ namespace App\Services;
 
 use App\Repositories\EvaluadorRepository;
 use App\Repositories\UsuarioRepository;
-use App\Model\Usuario;
+use App\Models\Usuario;
 use App\Mail\UserCredentialsMail;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;

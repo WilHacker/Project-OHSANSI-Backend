@@ -3,7 +3,7 @@
 namespace App\Http\Requests\Competencia;
 
 use Illuminate\Foundation\Http\FormRequest;
-use App\Model\CronogramaFase;
+use App\Models\CronogramaFase;
 use Carbon\Carbon;
 
 class StoreCompetenciaRequest extends FormRequest

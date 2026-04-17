@@ -2,8 +2,8 @@
 
 namespace App\Repositories;
 
-use App\Model\Examen;
-use App\Model\Evaluacion;
+use App\Models\Examen;
+use App\Models\Evaluacion;
 use Illuminate\Database\Eloquent\Collection;
 
 class ExamenRepository
@@ -60,6 +60,13 @@ class ExamenRepository
                 'usuarioBloqueo.persona',
             ])
             ->get();
+    }
+
+    public function paginadosPorCompetencia(int $competenciaId, int $porPagina = 15)
+    {
+        return Examen::where('id_competencia', $competenciaId)
+            ->orderBy('created_at', 'desc')
+            ->paginate($porPagina);
     }
 
     public function sumarPonderaciones(int $competenciaId, ?int $excludeId = null): float

@@ -5,7 +5,7 @@ namespace App\Services;
 use App\Exceptions\Dominio\AutorizacionException;
 use App\Exceptions\Dominio\CompetenciaException;
 use App\Repositories\CompetenciaRepository;
-use App\Model\Competencia;
+use App\Models\Competencia;
 use App\Repositories\UsuarioRepository;
 use App\Events\CompetenciaEstadoCambiado;
 

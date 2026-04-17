@@ -2,9 +2,9 @@
 
 namespace App\Repositories;
 
-use App\Model\GradoEscolaridad;
-use App\Model\Departamento;
-use App\Model\Olimpiada;
+use App\Models\GradoEscolaridad;
+use App\Models\Departamento;
+use App\Models\Olimpiada;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 

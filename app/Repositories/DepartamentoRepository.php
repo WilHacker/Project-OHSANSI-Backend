@@ -2,7 +2,7 @@
 
 namespace App\Repositories;
 
-use App\Model\Departamento;
+use App\Models\Departamento;
 use Illuminate\Database\Eloquent\Collection;
 
 class DepartamentoRepository

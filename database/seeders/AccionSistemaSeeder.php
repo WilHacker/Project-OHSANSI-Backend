@@ -3,7 +3,7 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use App\Model\AccionSistema;
+use App\Models\AccionSistema;
 
 class AccionSistemaSeeder extends Seeder
 {

@@ -3,7 +3,7 @@
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
-use App\Model\Examen;
+use App\Models\Examen;
 use App\Services\ExamenService;
 use Illuminate\Support\Facades\Log;
 

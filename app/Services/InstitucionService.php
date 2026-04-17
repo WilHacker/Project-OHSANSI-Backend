@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use App\Model\Institucion;
+use App\Models\Institucion;
 use App\Repositories\InstitucionRepository;
 use Illuminate\Database\Eloquent\Collection;
 use Exception;

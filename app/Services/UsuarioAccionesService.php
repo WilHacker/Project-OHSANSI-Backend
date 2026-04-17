@@ -2,8 +2,8 @@
 
 namespace App\Services;
 
-use App\Model\Olimpiada;
-use App\Model\Usuario;
+use App\Models\Olimpiada;
+use App\Models\Usuario;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 

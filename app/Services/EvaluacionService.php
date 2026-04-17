@@ -5,7 +5,7 @@ namespace App\Services;
 use App\Exceptions\Dominio\AutorizacionException;
 use App\Exceptions\Dominio\EvaluacionException;
 use App\Repositories\EvaluacionRepository;
-use App\Model\Examen;
+use App\Models\Examen;
 use App\Events\CompetidorBloqueado;
 use App\Events\CompetidorLiberado;
 use Illuminate\Support\Facades\DB;
@@ -25,13 +25,6 @@ class EvaluacionService
         ])->findOrFail($idExamen);
     }
 
-    /**
-     * Bloquea una ficha de evaluación para el juez autenticado (semáforo rojo).
-     *
-     * Garantías antes de llamar a este método:
-     * - El usuario existe y está autenticado (auth:sanctum).
-     * - El $userId proviene de auth()->id() en el controller.
-     */
     public function bloquearFicha(int $idEvaluacion, int $userId)
     {
         return DB::transaction(function () use ($idEvaluacion, $userId) {
@@ -41,12 +34,12 @@ class EvaluacionService
                 throw new EvaluacionException('El examen no está en curso, no se puede bloquear.', 422);
             }
 
-            if ($evaluacion->bloqueado_por && $evaluacion->bloqueado_por !== $userId) {
-                $tiempoLimiteMinutos = 5;
-                $horaBloqueo         = Carbon::parse($evaluacion->fecha_bloqueo);
+            if ($evaluacion->bloqueado_por !== null && $evaluacion->bloqueado_por !== $userId) {
+                $timeoutMinutos = config('ohsansi.bloqueo_timeout_minutos', 5);
+                $horaBloqueo    = Carbon::parse($evaluacion->fecha_bloqueo);
 
-                if (now()->diffInMinutes($horaBloqueo) < $tiempoLimiteMinutos) {
-                    $nombreJuez = $evaluacion->usuarioBloqueo->persona->nombre ?? 'otro juez';
+                if (now()->diffInMinutes($horaBloqueo) < $timeoutMinutos) {
+                    $nombreJuez = $evaluacion->usuarioBloqueo?->persona?->nombre ?? 'otro juez';
                     throw new EvaluacionException("Ficha ocupada por {$nombreJuez}. Intente en unos instantes.");
                 }
             }
@@ -59,13 +52,14 @@ class EvaluacionService
         });
     }
 
-    /**
-     * Guarda o corrige la nota de una evaluación.
-     */
     public function guardarNota(int $idEvaluacion, array $datos)
     {
         return DB::transaction(function () use ($idEvaluacion, $datos) {
             $evaluacion = $this->repo->findForUpdate($idEvaluacion);
+
+            if ($evaluacion->bloqueado_por === null) {
+                throw new EvaluacionException('La ficha no está bloqueada. Debes bloquearla primero.', 422);
+            }
 
             if ($evaluacion->bloqueado_por !== $datos['user_id']) {
                 throw new EvaluacionException('Perdiste el bloqueo de esta ficha.', 422);
@@ -98,13 +92,14 @@ class EvaluacionService
         });
     }
 
-    /**
-     * Descalifica a un competidor (tarjeta roja).
-     */
     public function descalificarCompetidor(int $idEvaluacion, int $userId, string $motivo)
     {
         return DB::transaction(function () use ($idEvaluacion, $userId, $motivo) {
             $evaluacion = $this->repo->findForUpdate($idEvaluacion);
+
+            if ($evaluacion->bloqueado_por === null) {
+                throw new AutorizacionException('Debes bloquear la ficha antes de descalificar.');
+            }
 
             if ($evaluacion->bloqueado_por !== $userId) {
                 throw new AutorizacionException('Debes bloquear la ficha antes de descalificar.');
@@ -126,9 +121,6 @@ class EvaluacionService
         });
     }
 
-    /**
-     * Libera una ficha bloqueada (semáforo verde sin guardar).
-     */
     public function desbloquearFicha(int $idEvaluacion, int $userId)
     {
         $evaluacion = $this->repo->find($idEvaluacion);
@@ -144,9 +136,6 @@ class EvaluacionService
         return $evaluacion;
     }
 
-    /**
-     * Menú del juez: lista las áreas y niveles donde está asignado.
-     */
     public function listarAreasNivelesParaEvaluador(int $userId): array
     {
         $asignaciones = $this->repo->getAreasConExamenesPorEvaluador($userId);

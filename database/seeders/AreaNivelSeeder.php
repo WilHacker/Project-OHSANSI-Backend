@@ -4,12 +4,12 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
-use App\Model\Area;
-use App\Model\Nivel;
-use App\Model\Olimpiada;
-use App\Model\AreaOlimpiada;
-use App\Model\AreaNivel;
-use App\Model\GradoEscolaridad;
+use App\Models\Area;
+use App\Models\Nivel;
+use App\Models\Olimpiada;
+use App\Models\AreaOlimpiada;
+use App\Models\AreaNivel;
+use App\Models\GradoEscolaridad;
 
 class AreaNivelSeeder extends Seeder
 {

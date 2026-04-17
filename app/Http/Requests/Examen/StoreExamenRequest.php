@@ -4,7 +4,7 @@ namespace App\Http\Requests\Examen;
 
 use Illuminate\Foundation\Http\FormRequest;
 use App\Rules\ValidarReglasExamen;
-use App\Model\Examen;
+use App\Models\Examen;
 use Illuminate\Validation\Validator;
 
 class StoreExamenRequest extends FormRequest

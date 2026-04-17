@@ -2,9 +2,9 @@
 
 namespace App\Services;
 
-use App\Model\Evaluacion;
-use App\Model\Examen;
-use App\Model\Parametro;
+use App\Models\Evaluacion;
+use App\Models\Examen;
+use App\Models\Parametro;
 
 class CalculadoraResultadosService
 {

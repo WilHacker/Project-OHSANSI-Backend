@@ -2,9 +2,9 @@
 
 namespace App\Repositories;
 
-use App\Model\Evaluacion;
-use App\Model\LogCambioNota;
-use App\Model\EvaluadorAn;
+use App\Models\Evaluacion;
+use App\Models\LogCambioNota;
+use App\Models\EvaluadorAn;
 use Illuminate\Database\Eloquent\Collection;
 
 class EvaluacionRepository

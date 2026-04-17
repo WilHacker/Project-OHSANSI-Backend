@@ -5,8 +5,8 @@ namespace App\Http\Controllers;
 use App\Services\AreaOlimpiadaService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Routing\Controller;
-use App\Model\Olimpiada;
-use App\Model\FaseGlobal;
+use App\Models\Olimpiada;
+use App\Models\FaseGlobal;
 
 class AreaOlimpiadaController extends Controller
 {

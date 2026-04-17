@@ -2,8 +2,8 @@
 
 namespace App\Repositories;
 
-use App\Model\AreaNivelGrado;
-use App\Model\AreaNivel;
+use App\Models\AreaNivelGrado;
+use App\Models\AreaNivel;
 use Illuminate\Database\Eloquent\Collection;
 
 class AreaNivelGradoRepository

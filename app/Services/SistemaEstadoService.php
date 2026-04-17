@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use App\Model\Olimpiada;
+use App\Models\Olimpiada;
 use App\Events\SistemaEstadoActualizado;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;

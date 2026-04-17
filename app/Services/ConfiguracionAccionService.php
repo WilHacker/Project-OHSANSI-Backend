@@ -5,9 +5,9 @@ namespace App\Services;
 use App\Repositories\ConfiguracionAccionRepository;
 use App\Services\UsuarioAccionesService;
 use App\Events\MisAccionesActualizadas;
-use App\Model\AccionSistema;
-use App\Model\FaseGlobal;
-use App\Model\Olimpiada;
+use App\Models\AccionSistema;
+use App\Models\FaseGlobal;
+use App\Models\Olimpiada;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Exception;
@@ -111,12 +111,12 @@ class ConfiguracionAccionService
             return;
         }
 
+        // Nota: no filtramos por usuario.estado / usuario_rol.estado porque
+        // esas columnas no existen en el schema actual. Notificamos a todos
+        // los usuarios con esos roles para que actualicen su vista de acciones.
         $userIds = DB::table('usuario_rol')
-            ->join('usuario', 'usuario.id_usuario', '=', 'usuario_rol.id_usuario')
-            ->whereIn('usuario_rol.id_rol', $rolesIds)
-            ->where('usuario_rol.estado', 'AC')
-            ->where('usuario.estado', 'AC')
-            ->pluck('usuario.id_usuario')
+            ->whereIn('id_rol', $rolesIds)
+            ->pluck('id_usuario')
             ->unique();
 
         foreach ($userIds as $userId) {

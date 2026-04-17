@@ -3,8 +3,8 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use App\Model\Area;
-use App\Model\Olimpiada;
+use App\Models\Area;
+use App\Models\Olimpiada;
 
 class AreasSeeder extends Seeder
 {

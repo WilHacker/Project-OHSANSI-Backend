@@ -2,11 +2,11 @@
 
 namespace App\Services;
 
-use App\Model\AreaNivel;
-use App\Model\Olimpiada;
-use App\Model\AreaOlimpiada;
-use App\Model\Area;
-use App\Model\Nivel;
+use App\Models\AreaNivel;
+use App\Models\Olimpiada;
+use App\Models\AreaOlimpiada;
+use App\Models\Area;
+use App\Models\Nivel;
 use App\Repositories\AreaNivelRepository;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Log;

@@ -3,7 +3,7 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use App\Model\GradoEscolaridad;
+use App\Models\GradoEscolaridad;
 
 class GradoEscolaridadSeeder extends Seeder
 {

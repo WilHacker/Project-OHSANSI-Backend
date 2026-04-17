@@ -2,11 +2,11 @@
 
 namespace App\Repositories;
 
-use App\Model\Usuario;
-use App\Model\Persona;
-use App\Model\Rol;
-use App\Model\EvaluadorAn;
-use App\Model\Examen;
+use App\Models\Usuario;
+use App\Models\Persona;
+use App\Models\Rol;
+use App\Models\EvaluadorAn;
+use App\Models\Examen;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Hash;
 
