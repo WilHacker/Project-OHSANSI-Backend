@@ -64,9 +64,6 @@ class ConfiguracionAccionService
     public function update(array $datos)
     {
         $listaCambios = $datos;
-        if (empty($listaCambios) && isset($datos[0])) {
-            $listaCambios = $datos;
-        }
 
         if (empty($listaCambios)) {
             Log::warning('ConfiguracionAccionService: Lista vacía, no se actualizó nada.');
@@ -78,18 +75,16 @@ class ConfiguracionAccionService
             $accionesAfectadasIds = [];
 
             foreach ($listaCambios as $config) {
-                if (isset($config['id_configuracion_accion'])) {
+                if (isset($config['id_configuracion_accion'], $config['id_accion_sistema'])) {
 
                     $estado = filter_var($config['habilitada'], FILTER_VALIDATE_BOOLEAN);
 
-                    $registroActualizado = $this->repoConfig->updateStatus(
+                    $this->repoConfig->updateStatus(
                         $config['id_configuracion_accion'],
                         $estado
                     );
 
-                    if ($registroActualizado) {
-                        $accionesAfectadasIds[] = $registroActualizado->id_accion_sistema;
-                    }
+                    $accionesAfectadasIds[] = $config['id_accion_sistema'];
                 }
             }
 

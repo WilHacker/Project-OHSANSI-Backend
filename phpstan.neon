@@ -9,6 +9,3 @@ parameters:
 
     phpVersion: 80200
 
-    ignoreErrors:
-        # Relaciones de Eloquent devuelven mixed en análisis estático
-        - '#Call to an undefined method Illuminate\\Database\\Eloquent\\Relations\\.*#'

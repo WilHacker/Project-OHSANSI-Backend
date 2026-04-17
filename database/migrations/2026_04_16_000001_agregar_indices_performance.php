@@ -27,11 +27,11 @@ return new class extends Migration
         // --- Tabla: competencia ---
         // id_fase_global: filtros por fase en el dashboard del responsable
         // id_usuario_aval: trazabilidad del usuario que avaló
-        // estado: filtro principal en listados (borrador/publicada/iniciada/cerrada)
+        // estado_fase: filtro principal en listados (borrador/publicada/en_proceso/concluida/avalada)
         Schema::table('competencia', function (Blueprint $table) {
             $table->index('id_fase_global', 'idx_competencia_id_fase_global');
             $table->index('id_usuario_aval', 'idx_competencia_id_usuario_aval');
-            $table->index('estado', 'idx_competencia_estado');
+            $table->index('estado_fase', 'idx_competencia_estado_fase');
         });
 
         // --- Tabla: area_nivel ---
@@ -70,7 +70,7 @@ return new class extends Migration
         Schema::table('competencia', function (Blueprint $table) {
             $table->dropIndex('idx_competencia_id_fase_global');
             $table->dropIndex('idx_competencia_id_usuario_aval');
-            $table->dropIndex('idx_competencia_estado');
+            $table->dropIndex('idx_competencia_estado_fase');
         });
 
         Schema::table('area_nivel', function (Blueprint $table) {

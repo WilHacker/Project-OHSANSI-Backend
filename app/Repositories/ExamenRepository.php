@@ -41,6 +41,7 @@ class ExamenRepository
         ->get();
     }
 
+    /** @return \Illuminate\Database\Eloquent\Collection<int, Examen> */
     public function getSimpleByAreaNivel(int $idAreaNivel): Collection
     {
         return Examen::select('id_examen', 'nombre')
@@ -51,6 +52,7 @@ class ExamenRepository
             ->get();
     }
 
+    /** @return \Illuminate\Database\Eloquent\Collection<int, Evaluacion> */
     public function getCompetidoresDeExamen(int $idExamen): Collection
     {
         return Evaluacion::where('id_examen', $idExamen)

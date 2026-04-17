@@ -22,8 +22,8 @@ class UpdateFaseCronogramaRequest extends FormRequest
             if ($fase && $fase->cronograma) {
                 $cronograma = $fase->cronograma;
                 $this->merge([
-                    'fecha_inicio' => $this->input('fecha_inicio', $cronograma->fecha_inicio?->format('Y-m-d H:i:s')),
-                    'fecha_fin'    => $this->input('fecha_fin', $cronograma->fecha_fin?->format('Y-m-d H:i:s')),
+                    'fecha_inicio' => $this->input('fecha_inicio', $cronograma->fecha_inicio->format('Y-m-d H:i:s')),
+                    'fecha_fin'    => $this->input('fecha_fin', $cronograma->fecha_fin->format('Y-m-d H:i:s')),
                 ]);
             }
         }

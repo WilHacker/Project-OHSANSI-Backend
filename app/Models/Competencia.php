@@ -9,6 +9,46 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
+/**
+ * @property int $id_competencia
+ * @property int|null $id_fase_global
+ * @property int|null $id_area_nivel
+ * @property \Illuminate\Support\Carbon $fecha_inicio
+ * @property \Illuminate\Support\Carbon $fecha_fin
+ * @property string $estado_fase
+ * @property string $criterio_clasificacion
+ * @property int|null $id_usuario_aval
+ * @property \Illuminate\Support\Carbon|null $fecha_aval
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \App\Models\AreaNivel|null $areaNivel
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Examen> $examenes
+ * @property-read int|null $examenes_count
+ * @property-read \App\Models\FaseGlobal|null $faseGlobal
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Medallero> $medalleros
+ * @property-read int|null $medalleros_count
+ * @property-read \App\Models\Usuario|null $usuarioAval
+ * @method static Builder<static>|Competencia avalada()
+ * @method static Builder<static>|Competencia borrador()
+ * @method static Builder<static>|Competencia concluida()
+ * @method static Builder<static>|Competencia enProceso()
+ * @method static Builder<static>|Competencia newModelQuery()
+ * @method static Builder<static>|Competencia newQuery()
+ * @method static Builder<static>|Competencia publicada()
+ * @method static Builder<static>|Competencia query()
+ * @method static Builder<static>|Competencia whereCreatedAt($value)
+ * @method static Builder<static>|Competencia whereCriterioClasificacion($value)
+ * @method static Builder<static>|Competencia whereEstadoFase($value)
+ * @method static Builder<static>|Competencia whereFechaAval($value)
+ * @method static Builder<static>|Competencia whereFechaFin($value)
+ * @method static Builder<static>|Competencia whereFechaInicio($value)
+ * @method static Builder<static>|Competencia whereIdAreaNivel($value)
+ * @method static Builder<static>|Competencia whereIdCompetencia($value)
+ * @method static Builder<static>|Competencia whereIdFaseGlobal($value)
+ * @method static Builder<static>|Competencia whereIdUsuarioAval($value)
+ * @method static Builder<static>|Competencia whereUpdatedAt($value)
+ * @mixin \Eloquent
+ */
 class Competencia extends Model
 {
     use HasFactory;

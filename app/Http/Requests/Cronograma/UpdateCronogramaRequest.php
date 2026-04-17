@@ -30,8 +30,8 @@ class UpdateCronogramaRequest extends FormRequest
             $fin = $this->input('fecha_fin');
 
             $this->merge([
-                'fecha_inicio' => $inicio ?? $cronograma->fecha_inicio?->format('Y-m-d H:i:s'),
-                'fecha_fin'    => $fin    ?? $cronograma->fecha_fin?->format('Y-m-d H:i:s'),
+                'fecha_inicio' => $inicio ?? $cronograma->fecha_inicio->format('Y-m-d H:i:s'),
+                'fecha_fin'    => $fin    ?? $cronograma->fecha_fin->format('Y-m-d H:i:s'),
             ]);
         }
     }

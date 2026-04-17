@@ -85,6 +85,7 @@ class CompetidorRepository
      * Obtiene competidores para generar evaluaciones, aplicando filtros estrictos.
      * Filtro 1: Estar habilitado (campo en tabla competidor).
      * Filtro 2: Pertenecer a una Olimpiada con estado Activo (1).
+     * @return \Illuminate\Database\Eloquent\Collection<int, Competidor>
      */
     public function getHabilitadosPorAreaNivel(int $idAreaNivel): Collection
     {

@@ -52,7 +52,7 @@ class OlimpiadaService
         $gestiones = $this->olimpiadaRepository->getAll();
         $currentYear = date('Y');
 
-        return $gestiones->map(function ($olimpiada) use ($currentYear) {
+        return $gestiones->map(function ($olimpiada) {
             return [
                 'id' => $olimpiada->id_olimpiada,
                 'nombre' => $olimpiada->nombre,
@@ -107,5 +107,15 @@ class OlimpiadaService
                 'estado' => $olimpiada->estado,
             ];
         });
+    }
+
+    public function obtenerGestiones(): Collection
+    {
+        return $this->olimpiadaRepository->getAll()->map(fn (Olimpiada $olimpiada) => [
+            'id'      => $olimpiada->id_olimpiada,
+            'nombre'  => $olimpiada->nombre,
+            'gestion' => $olimpiada->gestion,
+            'estado'  => $olimpiada->estado,
+        ]);
     }
 }

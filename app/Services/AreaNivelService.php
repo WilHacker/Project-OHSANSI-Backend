@@ -167,17 +167,17 @@ class AreaNivelService
 {
     $olimpiada = Olimpiada::findOrFail($idOlimpiada);
     $areas = Area::with([
-        'areaOlimpiada' => function($query) use ($idOlimpiada) {
+        'areaOlimpiadas' => function($query) use ($idOlimpiada) {
             $query->where('id_olimpiada', $idOlimpiada);
         },
-        'areaOlimpiada.areaNiveles.nivel:id_nivel,nombre'
+        'areaOlimpiadas.areaNiveles.nivel:id_nivel,nombre'
     ])
-    ->whereHas('areaOlimpiada.areaNiveles')
+    ->whereHas('areaOlimpiadas.areaNiveles')
     ->get(['id_area', 'nombre']);
 
     $resultado = $areas->map(function($area) {
         $niveles = collect();
-        foreach ($area->areaOlimpiada as $areaOlimpiada) {
+        foreach ($area->areaOlimpiadas as $areaOlimpiada) {
             foreach ($areaOlimpiada->areaNiveles as $areaNivel) {
                 $niveles->push([
                     'id_nivel' => $areaNivel->nivel->id_nivel,

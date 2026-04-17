@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Collection;
 
 class OlimpiadaRepository
 {
+    /** @return \Illuminate\Database\Eloquent\Collection<int, Olimpiada> */
     public function getAll(): Collection
     {
         return Olimpiada::orderBy('gestion', 'desc')->get();

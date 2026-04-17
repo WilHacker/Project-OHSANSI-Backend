@@ -16,7 +16,7 @@ class UsuarioAccionesService
 
     public function obtenerDetalleCapacidades(int $userId): array
     {
-        $usuario = Usuario::with('roles')->find($userId);
+        $usuario = Usuario::with(['roles', 'persona'])->find($userId);
         if (!$usuario) return ['error' => 'Usuario no encontrado'];
 
         $rolesIds = $usuario->roles->pluck('id_rol')->toArray();
@@ -59,7 +59,7 @@ class UsuarioAccionesService
             ->toArray();
         return [
             'user_id' => $usuario->id_usuario,
-            'usuario' => $usuario->nombre . ' ' . $usuario->ap_paterno,
+            'usuario' => $usuario->persona?->nombre . ' ' . $usuario->persona?->apellido,
             'roles'   => $usuario->roles->pluck('nombre'),
             'debug_estado' => [
                 'olimpiada_activa' => $olimpiada->nombre,
@@ -74,7 +74,7 @@ class UsuarioAccionesService
     {
         return [
             'user_id' => $usuario->id_usuario,
-            'usuario' => $usuario->nombre . ' ' . $usuario->ap_paterno,
+            'usuario' => $usuario->persona?->nombre . ' ' . $usuario->persona?->apellido,
             'roles'   => $usuario->roles->pluck('nombre'),
             'debug_estado' => [
                 'mensaje_sistema' => $motivo,

@@ -23,7 +23,7 @@ class UpdateExamenRequest extends FormRequest
             'configuracion_reglas' => [
                 'nullable',
                 'array',
-                new ValidarReglasExamen($this->input('tipo_regla') ?? $this->route('examen')?->tipo_regla)
+                new ValidarReglasExamen($this->input('tipo_regla') ?? (($examen = $this->route('examen')) instanceof \App\Models\Examen ? $examen->tipo_regla : null))
             ],
         ];
     }

@@ -57,11 +57,6 @@ class CompetenciaController extends Controller
     public function show(int $id): JsonResponse
     {
         $competencia = $this->repository->findWithFullHierarchy($id);
-
-        if (!$competencia) {
-            return response()->json(['mensaje' => 'Competencia no encontrada.'], 404);
-        }
-
         return response()->json($competencia);
     }
 

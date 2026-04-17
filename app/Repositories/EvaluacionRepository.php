@@ -108,6 +108,7 @@ class EvaluacionRepository
      * Obtiene las asignaciones de un evaluador que tengan EXÁMENES REALES creados.
      * Filtra por Olimpiada Actual.
      */
+    /** @return \Illuminate\Database\Eloquent\Collection<int, EvaluadorAn> */
     public function getAreasConExamenesPorEvaluador(int $userId): \Illuminate\Database\Eloquent\Collection
     {
         return EvaluadorAn::query()

@@ -17,11 +17,13 @@ class RolAccionRepository
         return RolAccion::updateOrCreate($busqueda, $valores);
     }
 
+    /** @return \Illuminate\Database\Eloquent\Collection<int, RolAccion> */
     public function getAllWithRelations(): Collection
     {
         return RolAccion::with(['accionSistema', 'rol'])->get();
     }
 
+    /** @return \Illuminate\Database\Eloquent\Collection<int, RolAccion> */
     public function getByRol(int $idRol): Collection
     {
         return RolAccion::with('accionSistema')

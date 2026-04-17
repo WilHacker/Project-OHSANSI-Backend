@@ -105,7 +105,7 @@ class OlimpiadaController extends Controller
             'gestion.unique' => 'Ya existe una olimpiada con esta gestión.',
         ]);
 
-        $olimpiada = $this->olimpiadaService->crearOlimpiadaDirecta($request->validated());
+        $olimpiada = $this->olimpiadaService->crearOlimpiadaDirecta($request->only(['nombre', 'gestion', 'estado']));
 
         return response()->json([
             'success' => true,

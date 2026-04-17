@@ -119,7 +119,7 @@ class ListaResponsableAreaController extends Controller
     public function getDepartamento(): JsonResponse
 {
     try {
-        $departamentos = $this->listaResponsableAreaService->getListaDepartamento();
+        $departamentos = $this->listaResponsableAreaService->getListaDepartamentos();
 
         return response()->json([
             'success' => true,

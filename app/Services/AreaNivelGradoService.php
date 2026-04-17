@@ -149,21 +149,21 @@ class AreaNivelGradoService
             $olimpiadaActiva = $this->obtenerOlimpiadaActiva();
             
             $areas = Area::with([
-                'areaOlimpiada' => function($query) use ($olimpiadaActiva) {
+                'areaOlimpiadas' => function($query) use ($olimpiadaActiva) {
                     $query->where('id_olimpiada', $olimpiadaActiva->id_olimpiada);
                 },
-                'areaOlimpiada.areaNiveles' => function($query) {
+                'areaOlimpiadas.areaNiveles' => function($query) {
                     $query->where('es_activo', true);
                 },
-                'areaOlimpiada.areaNiveles.nivel:id_nivel,nombre'
+                'areaOlimpiadas.areaNiveles.nivel:id_nivel,nombre'
             ])
             ->orderBy('id_area', 'asc')
             ->get(['id_area', 'nombre']);
 
             $resultado = $areas->map(function($area) {
                 $nivelesArray = collect();
-                
-                foreach ($area->areaOlimpiada as $areaOlimpiada) {
+
+                foreach ($area->areaOlimpiadas as $areaOlimpiada) {
                     foreach ($areaOlimpiada->areaNiveles as $areaNivel) {
                         $nivelesArray->push([
                             'id_nivel' => $areaNivel->nivel->id_nivel,
@@ -205,16 +205,16 @@ class AreaNivelGradoService
             $olimpiadaActiva = $this->obtenerOlimpiadaActiva();
             
             $areas = Area::with([
-                'areaOlimpiada' => function($query) use ($olimpiadaActiva) {
+                'areaOlimpiadas' => function($query) use ($olimpiadaActiva) {
                     $query->where('id_olimpiada', $olimpiadaActiva->id_olimpiada);
                 },
-                'areaOlimpiada.areaNiveles' => function($query) {
+                'areaOlimpiadas.areaNiveles' => function($query) {
                     $query->where('es_activo', true);
                 },
-                'areaOlimpiada.areaNiveles.nivel:id_nivel,nombre',
-                'areaOlimpiada.areaNiveles.gradosEscolaridad:id_grado_escolaridad,nombre'
+                'areaOlimpiadas.areaNiveles.nivel:id_nivel,nombre',
+                'areaOlimpiadas.areaNiveles.gradosEscolaridad:id_grado_escolaridad,nombre'
             ])
-            ->whereHas('areaOlimpiada.areaNiveles', function($query) {
+            ->whereHas('areaOlimpiadas.areaNiveles', function($query) {
                 $query->where('es_activo', true);
             })
             ->orderBy('id_area', 'asc')
@@ -222,8 +222,8 @@ class AreaNivelGradoService
 
             $resultado = $areas->map(function($area) {
                 $nivelesAgrupados = collect();
-                
-                foreach ($area->areaOlimpiada as $areaOlimpiada) {
+
+                foreach ($area->areaOlimpiadas as $areaOlimpiada) {
                     foreach ($areaOlimpiada->areaNiveles as $areaNivel) {
                         $nivelesAgrupados->push([
                             'id_nivel' => $areaNivel->nivel->id_nivel,

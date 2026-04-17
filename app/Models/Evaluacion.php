@@ -8,6 +8,43 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
+/**
+ * @property int $id_evaluacion
+ * @property int|null $id_competidor
+ * @property int|null $id_examen
+ * @property numeric $nota
+ * @property string $estado_participacion
+ * @property string|null $observacion
+ * @property string|null $resultado_calculado
+ * @property int|null $bloqueado_por
+ * @property \Illuminate\Support\Carbon|null $fecha_bloqueo
+ * @property bool $esta_calificado
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \App\Models\Competidor|null $competidor
+ * @property-read mixed $es_zombie
+ * @property-read \App\Models\Examen|null $examen
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\LogCambioNota> $logsCambios
+ * @property-read int|null $logs_cambios_count
+ * @property-read mixed $nombre_juez_bloqueo
+ * @property-read \App\Models\Usuario|null $usuarioBloqueo
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Evaluacion newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Evaluacion newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Evaluacion query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Evaluacion whereBloqueadoPor($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Evaluacion whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Evaluacion whereEstaCalificado($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Evaluacion whereEstadoParticipacion($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Evaluacion whereFechaBloqueo($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Evaluacion whereIdCompetidor($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Evaluacion whereIdEvaluacion($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Evaluacion whereIdExamen($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Evaluacion whereNota($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Evaluacion whereObservacion($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Evaluacion whereResultadoCalculado($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Evaluacion whereUpdatedAt($value)
+ * @mixin \Eloquent
+ */
 class Evaluacion extends Model
 {
     use HasFactory;

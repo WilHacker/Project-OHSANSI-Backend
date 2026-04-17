@@ -10,7 +10,7 @@ class ValidarReglasExamen implements ValidationRule
     public function __construct(protected ?string $tipoRegla) {}
     
     /**
-     * @param  \Closure(string, ?array<string, string>): \Illuminate\Translation\PotentiallyTranslatedString  $fail
+     * @param  \Closure(string, string|null=): \Illuminate\Translation\PotentiallyTranslatedString  $fail
      */
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
