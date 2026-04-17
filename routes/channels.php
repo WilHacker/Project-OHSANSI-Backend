@@ -40,7 +40,7 @@ Broadcast::channel('examen.{id}', function ($user, $id) {
 
     return EvaluadorAn::where('id_usuario', $user->id_usuario)
         ->where('id_area_nivel', $examen->competencia->id_area_nivel)
-        ->where('estado', 1)
+        ->where('estado', true)
         ->exists();
 });
 
@@ -59,7 +59,7 @@ Broadcast::channel('competencia.{id}', function ($user, $id) {
 
     return EvaluadorAn::where('id_usuario', $user->id_usuario)
             ->where('id_area_nivel', $idAreaNivel)
-            ->where('estado', 1)
+            ->where('estado', true)
             ->exists()
         || ResponsableArea::where('id_usuario', $user->id_usuario)
             ->where('id_area_olimpiada', $idAreaOlimpiada)
@@ -78,7 +78,7 @@ Broadcast::channel('area-nivel.{id}', function ($user, $id) {
 
     return EvaluadorAn::where('id_usuario', $user->id_usuario)
             ->where('id_area_nivel', $id)
-            ->where('estado', 1)
+            ->where('estado', true)
             ->exists()
         || ResponsableArea::where('id_usuario', $user->id_usuario)
             ->where('id_area_olimpiada', $areaNivel->id_area_olimpiada)
