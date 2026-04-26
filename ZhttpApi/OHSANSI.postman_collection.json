@@ -1,0 +1,1167 @@
+{
+  "info": {
+    "name": "OHSANSI API",
+    "description": "Colección completa de la API REST del sistema de olimpiadas OHSANSI.\n\n**Variables de entorno necesarias:**\n- `baseUrl` → http://localhost:8000/api/v1\n- `token`   → se llena automáticamente al hacer login\n\n**Cómo usar:**\n1. Importar este archivo en Postman\n2. Crear un Environment con `baseUrl` = http://localhost:8000/api/v1\n3. Ejecutar `POST /auth/login` — el token se guarda automáticamente",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:8000/api/v1", "type": "string" },
+    { "key": "token",   "value": "", "type": "string" }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }]
+  },
+  "item": [
+
+    {
+      "name": "01 · Autenticación",
+      "item": [
+        {
+          "name": "Login",
+          "event": [{
+            "listen": "test",
+            "script": {
+              "exec": [
+                "const json = pm.response.json();",
+                "if (json.token) {",
+                "  pm.collectionVariables.set('token', json.token);",
+                "  pm.environment.set('token', json.token);",
+                "}"
+              ],
+              "type": "text/javascript"
+            }
+          }],
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "url": "{{baseUrl}}/auth/login",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@ohsansi.bo\",\n  \"password\": \"secreto123\"\n}"
+            },
+            "description": "Throttle: 10 intentos/min. El token se guarda automáticamente en la variable de colección."
+          }
+        },
+        {
+          "name": "Perfil del usuario autenticado",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/auth/me",
+            "description": "Devuelve los datos del usuario autenticado con sus roles y permisos."
+          }
+        },
+        {
+          "name": "Mis acciones disponibles",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/usuario/mis-acciones/usuario/1",
+            "description": "Reemplazar '1' con el id_usuario. Devuelve array de códigos de acción habilitados."
+          }
+        }
+      ]
+    },
+
+    {
+      "name": "02 · Sistema",
+      "item": [
+        {
+          "name": "Estado del sistema",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "GET",
+            "url": "{{baseUrl}}/sistema/estado"
+          }
+        },
+        {
+          "name": "Health check",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "GET",
+            "url": "{{baseUrl}}/test"
+          }
+        }
+      ]
+    },
+
+    {
+      "name": "03 · Olimpiadas",
+      "item": [
+        {
+          "name": "Olimpiada actual (público)",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "GET",
+            "url": "{{baseUrl}}/olimpiadas/actual"
+          }
+        },
+        {
+          "name": "Olimpiadas anteriores (público)",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "GET",
+            "url": "{{baseUrl}}/olimpiadas/anteriores"
+          }
+        },
+        {
+          "name": "Gestiones / años (público)",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "GET",
+            "url": "{{baseUrl}}/gestiones"
+          }
+        },
+        {
+          "name": "Listar todas las olimpiadas",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/olimpiadas"
+          }
+        },
+        {
+          "name": "Crear olimpiada",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/olimpiadas",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Olimpiada Científica Estudiantil 2025\",\n  \"gestion\": \"2025\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Crear olimpiada (admin — puede activar de inmediato)",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/olimpiadas/admin",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Olimpiada Científica Estudiantil 2025\",\n  \"gestion\": \"2025\",\n  \"estado\": true\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "description": "estado:true activa esta olimpiada y desactiva todas las demás."
+          }
+        },
+        {
+          "name": "Activar olimpiada",
+          "request": {
+            "method": "PATCH",
+            "url": "{{baseUrl}}/olimpiadas/1/activar",
+            "description": "Reemplazar '1' con el id de la olimpiada."
+          }
+        }
+      ]
+    },
+
+    {
+      "name": "04 · Competencias",
+      "item": [
+        {
+          "name": "Listar competencias",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/competencias?por_pagina=15",
+              "host": ["{{baseUrl}}"],
+              "path": ["competencias"],
+              "query": [{ "key": "por_pagina", "value": "15" }]
+            }
+          }
+        },
+        {
+          "name": "Ver competencia",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/competencias/1"
+          }
+        },
+        {
+          "name": "Crear competencia",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/competencias",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id_fase_global\": 1,\n  \"id_area_nivel\": 3,\n  \"fecha_inicio\": \"2025-08-01\",\n  \"fecha_fin\": \"2025-08-30\",\n  \"criterio_clasificacion\": \"suma_ponderada\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "description": "criterio_clasificacion: 'suma_ponderada' | 'promedio_simple' | 'manual'"
+          }
+        },
+        {
+          "name": "Actualizar competencia",
+          "request": {
+            "method": "PUT",
+            "url": "{{baseUrl}}/competencias/1",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fecha_inicio\": \"2025-08-05\",\n  \"fecha_fin\": \"2025-08-25\",\n  \"criterio_clasificacion\": \"promedio_simple\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Eliminar competencia",
+          "request": {
+            "method": "DELETE",
+            "url": "{{baseUrl}}/competencias/1"
+          }
+        },
+        {
+          "name": "▶ Publicar competencia",
+          "request": {
+            "method": "PATCH",
+            "url": "{{baseUrl}}/competencias/1/publicar",
+            "description": "Estado: borrador → publicada"
+          }
+        },
+        {
+          "name": "▶ Iniciar competencia",
+          "request": {
+            "method": "PATCH",
+            "url": "{{baseUrl}}/competencias/1/iniciar",
+            "description": "Estado: publicada → en_proceso"
+          }
+        },
+        {
+          "name": "▶ Cerrar competencia",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/competencias/1/cerrar",
+            "description": "Estado: en_proceso → concluida. Requiere que TODOS los exámenes estén finalizados."
+          }
+        },
+        {
+          "name": "▶ Avalar competencia",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/competencias/1/avalar",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"password_confirmacion\": \"mi_contraseña\"\n}"
+            },
+            "description": "Estado: concluida → avalada. Requiere la contraseña del responsable autenticado."
+          }
+        },
+        {
+          "name": "Áreas del responsable (olimpiada activa)",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/competencias/responsable/1/areas/actuales",
+            "description": "Reemplazar '1' con id_usuario del responsable."
+          }
+        },
+        {
+          "name": "Competencias por responsable y área",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/competencias/responsable/1/area/2",
+            "description": "Reemplazar IDs según corresponda."
+          }
+        },
+        {
+          "name": "Fases clasificatorias activas",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/competencias/fase-global/clasificatoria/actuales"
+          }
+        }
+      ]
+    },
+
+    {
+      "name": "05 · Exámenes",
+      "item": [
+        {
+          "name": "Listar exámenes de una competencia",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/examenes/competencias/1",
+            "description": "Reemplazar '1' con id_competencia."
+          }
+        },
+        {
+          "name": "Ver examen",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/examenes/1"
+          }
+        },
+        {
+          "name": "Crear examen",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/examenes",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id_competencia\": 1,\n  \"nombre\": \"Examen Clasificatorio\",\n  \"ponderacion\": 100,\n  \"maxima_nota\": 100,\n  \"fecha_hora_inicio\": \"2025-08-10 09:00:00\",\n  \"tipo_regla\": \"nota_corte\",\n  \"configuracion_reglas\": {\n    \"nota_corte\": 51\n  }\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "description": "tipo_regla: null | 'nota_corte'. Si tipo_regla es 'nota_corte', debe incluir configuracion_reglas.nota_corte."
+          }
+        },
+        {
+          "name": "Actualizar examen",
+          "request": {
+            "method": "PUT",
+            "url": "{{baseUrl}}/examenes/1",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Examen Clasificatorio Actualizado\",\n  \"fecha_hora_inicio\": \"2025-08-12 09:00:00\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Eliminar examen",
+          "request": {
+            "method": "DELETE",
+            "url": "{{baseUrl}}/examenes/1"
+          }
+        },
+        {
+          "name": "▶ Iniciar examen",
+          "request": {
+            "method": "PATCH",
+            "url": "{{baseUrl}}/examenes/1/iniciar",
+            "description": "Registra la fecha_inicio_real del examen."
+          }
+        },
+        {
+          "name": "▶ Finalizar examen",
+          "request": {
+            "method": "PATCH",
+            "url": "{{baseUrl}}/examenes/1/finalizar"
+          }
+        },
+        {
+          "name": "Competidores inscritos en examen",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/examenes/1/competidores"
+          }
+        },
+        {
+          "name": "Combo exámenes por área-nivel",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/examenes/combo/area-nivel/1",
+            "description": "Para select/dropdown en el frontend."
+          }
+        }
+      ]
+    },
+
+    {
+      "name": "06 · Sala de Evaluación",
+      "item": [
+        {
+          "name": "Pizarra del examen",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/sala-evaluacion/examen/1",
+            "description": "Devuelve todas las fichas del examen: competidor, nota, estado, quién tiene bloqueada la ficha."
+          }
+        },
+        {
+          "name": "Bloquear ficha (tomar)",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/sala-evaluacion/1/bloquear",
+            "description": "Reemplazar '1' con id_evaluacion. El evaluador 'toma' la ficha antes de escribir."
+          }
+        },
+        {
+          "name": "Guardar nota",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/sala-evaluacion/1/guardar",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nota\": 87.5,\n  \"estado_participacion\": \"presente\",\n  \"observacion\": \"Buen desempeño conceptual en álgebra lineal\",\n  \"motivo_cambio\": \"Corrección de error de digitación\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "description": "estado_participacion: 'presente' | 'ausente' | 'descalificado_etica'.\nSi es 'presente', nota no puede superar maxima_nota del examen.\nobservacion: descripción conceptual del resultado (requerida para certificados).\nmotivo_cambio: aparece en el log de auditoría."
+          }
+        },
+        {
+          "name": "Desbloquear ficha (soltar sin guardar)",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/sala-evaluacion/1/desbloquear"
+          }
+        },
+        {
+          "name": "Descalificar por ética (en sala)",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/sala-evaluacion/1/descalificar",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"motivo\": \"Uso de celular durante el examen\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Áreas-Niveles del evaluador",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/sala-evaluacion/evaluador/1/areas-niveles",
+            "description": "Reemplazar '1' con id_usuario del evaluador."
+          }
+        }
+      ]
+    },
+
+    {
+      "name": "07 · Evaluadores",
+      "item": [
+        {
+          "name": "Dashboard del evaluador",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/evaluadores/dashboard"
+          }
+        },
+        {
+          "name": "Listar evaluadores",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/evaluadores"
+          }
+        },
+        {
+          "name": "Ver evaluador",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/evaluadores/1"
+          }
+        },
+        {
+          "name": "Crear evaluador",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/evaluadores",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Carlos\",\n  \"apellido\": \"Rojas Vera\",\n  \"ci\": \"1234567\",\n  \"email\": \"carlos.rojas@ejemplo.bo\",\n  \"telefono\": \"72345678\",\n  \"password\": \"secreto123\",\n  \"id_olimpiada\": 1,\n  \"area_nivel_ids\": [2, 5, 8]\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "description": "area_nivel_ids: IDs de las combinaciones área-nivel que puede calificar."
+          }
+        },
+        {
+          "name": "Actualizar evaluador por CI",
+          "request": {
+            "method": "PUT",
+            "url": "{{baseUrl}}/evaluadores/ci/1234567",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Carlos Actualizado\",\n  \"email\": \"nuevo@email.bo\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Agregar asignaciones a evaluador",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/evaluadores/ci/1234567/asignaciones",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id_olimpiada\": 1,\n  \"area_nivel_ids\": [10, 12]\n}"
+            }
+          }
+        },
+        {
+          "name": "Asignaciones agrupadas",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/evaluadores/1/asignaciones-agrupadas"
+          }
+        }
+      ]
+    },
+
+    {
+      "name": "08 · Responsables de Área",
+      "item": [
+        {
+          "name": "Listar responsables",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/responsables"
+          }
+        },
+        {
+          "name": "Ver responsable",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/responsables/1"
+          }
+        },
+        {
+          "name": "Crear responsable",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/responsables",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"María\",\n  \"apellido\": \"López Quispe\",\n  \"ci\": \"7654321\",\n  \"email\": \"maria.lopez@ejemplo.bo\",\n  \"telefono\": \"71234567\",\n  \"password\": \"secreto123\",\n  \"id_olimpiada\": 1,\n  \"areas\": [3, 7]\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "description": "areas: IDs de las áreas bajo su responsabilidad."
+          }
+        },
+        {
+          "name": "Actualizar responsable por CI",
+          "request": {
+            "method": "PUT",
+            "url": "{{baseUrl}}/responsables/ci/7654321",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"María Renovada\",\n  \"telefono\": \"79876543\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Agregar áreas a responsable",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/responsables/ci/7654321/areas",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id_olimpiada\": 1,\n  \"areas\": [4, 9]\n}"
+            }
+          }
+        },
+        {
+          "name": "Áreas ocupadas en olimpiada activa",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/responsables/areas/ocupadas/gestion/actual",
+            "description": "Qué áreas ya tienen un responsable asignado."
+          }
+        },
+        {
+          "name": "Áreas con niveles del responsable (olimpiada activa)",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/responsables/1/areas-con-niveles/olimpiada-actual"
+          }
+        },
+        {
+          "name": "Gestiones por CI",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/responsables/ci/7654321/gestiones"
+          }
+        }
+      ]
+    },
+
+    {
+      "name": "09 · Importación CSV",
+      "item": [
+        {
+          "name": "Importar competidores",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/importar/2025",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre_archivo\": \"inscripciones_2025.csv\",\n  \"competidores\": [\n    {\n      \"persona\": {\n        \"nombre\": \"Ana\",\n        \"apellido\": \"Flores Mamani\",\n        \"ci\": \"9876543\",\n        \"genero\": \"F\",\n        \"email\": \"ana.flores@colegio.bo\",\n        \"telefono\": \"78901234\"\n      },\n      \"competidor\": {\n        \"grado_escolar\": \"Segundo de Secundaria\",\n        \"departamento\": \"Cochabamba\",\n        \"contacto_tutor\": \"71234567\",\n        \"tutor_academico\": \"Prof. Juan Ramírez\"\n      },\n      \"institucion\": {\n        \"nombre\": \"Colegio San Simón\"\n      },\n      \"area\": {\n        \"nombre\": \"Matemáticas\"\n      },\n      \"nivel\": {\n        \"nombre\": \"Secundaria\"\n      }\n    }\n  ]\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "description": "Reemplazar '2025' en la URL con el año/gestión.\nLa importación corre en background (queue). La respuesta incluye:\n- registrados: importados exitosamente\n- duplicados: ya existían\n- errores: filas con problemas (incluye número de línea y mensaje)"
+          }
+        }
+      ]
+    },
+
+    {
+      "name": "10 · Parámetros",
+      "item": [
+        {
+          "name": "Parámetros de gestión actual",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/parametros/gestion-actual"
+          }
+        },
+        {
+          "name": "Parámetros de todas las gestiones",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/parametros/gestiones"
+          }
+        },
+        {
+          "name": "Parámetros por área-niveles",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/parametros/an/area-niveles"
+          }
+        },
+        {
+          "name": "Parámetros por olimpiada",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/parametros/1",
+            "description": "Reemplazar '1' con id_olimpiada."
+          }
+        },
+        {
+          "name": "Crear / actualizar parámetros",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/parametros",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"area_niveles\": [\n    {\n      \"id_area_nivel\": 2,\n      \"nota_min_aprobacion\": 51,\n      \"cantidad_maxima\": 30\n    },\n    {\n      \"id_area_nivel\": 5,\n      \"nota_min_aprobacion\": 60,\n      \"cantidad_maxima\": null\n    }\n  ]\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "description": "nota_min_aprobacion: nota mínima para clasificar (0-100).\ncantidad_maxima: cupo máximo de clasificados (null = sin límite)."
+          }
+        }
+      ]
+    },
+
+    {
+      "name": "11 · Medallero",
+      "item": [
+        {
+          "name": "Áreas del responsable (gestión actual)",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/responsableGestion/1",
+            "description": "Reemplazar '1' con id del responsable."
+          }
+        },
+        {
+          "name": "Niveles por área",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/medallero/area/1/niveles"
+          }
+        },
+        {
+          "name": "Guardar configuración del medallero",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/medallero/configuracion",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id_area_nivel\": 3,\n  \"oros\": 1,\n  \"platas\": 2,\n  \"bronces\": 3,\n  \"menciones\": 5\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "description": "Configura cuántos premios de cada categoría se otorgan en un área-nivel."
+          }
+        }
+      ]
+    },
+
+    {
+      "name": "12 · Descalificaciones Administrativas",
+      "item": [
+        {
+          "name": "Listar descalificados",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/descalificados"
+          }
+        },
+        {
+          "name": "Registrar descalificación administrativa",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/descalificados",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id_competidor\": 42,\n  \"observaciones\": \"Comportamiento inadecuado fuera del aula de evaluación\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "description": "Descalificación fuera de sala — por el responsable de área. Diferente a la descalificación por ética en sala."
+          }
+        }
+      ]
+    },
+
+    {
+      "name": "13 · Reportes y Exportaciones",
+      "item": [
+        {
+          "name": "Ranking / Medallero oficial",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/reportes/competencia/1/ranking",
+            "description": "Si la competencia está avalada devuelve el medallero final.\nSi está concluida devuelve la lista de clasificados."
+          }
+        },
+        {
+          "name": "Historial de calificaciones (paginado)",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/reportes/historial-calificaciones?page=1&limit=20&id_area=1&ids_niveles=1,2&search=Ana",
+              "host": ["{{baseUrl}}"],
+              "path": ["reportes", "historial-calificaciones"],
+              "query": [
+                { "key": "page",       "value": "1" },
+                { "key": "limit",      "value": "20" },
+                { "key": "id_area",    "value": "1",   "description": "Filtro por área (nullable)" },
+                { "key": "ids_niveles","value": "1,2", "description": "IDs separados por coma (nullable)" },
+                { "key": "search",     "value": "Ana", "description": "Buscar por nombre (mínimo 3 chars)" }
+              ]
+            },
+            "description": "Requiere permiso REPORTES_CAMBIOS."
+          }
+        },
+        {
+          "name": "Historial de cambios de una evaluación",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/reportes/evaluacion/1/historial",
+            "description": "Log completo de modificaciones de nota para una evaluación específica."
+          }
+        },
+        {
+          "name": "Áreas (filtro para historial)",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/reportes/areas"
+          }
+        },
+        {
+          "name": "Niveles por área (filtro para historial)",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/reportes/areas/1/niveles"
+          }
+        },
+        {
+          "name": "⬇ Exportar Certificados (Excel)",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/reportes/competencia/1/exportar/certificados",
+            "description": "REQUIERE competencia en estado 'avalada'.\nDevuelve archivo .xlsx con: Nombre, Unidad Educativa, Departamento, Área, Nivel, Nota, Posición, Medalla, Tutor Académico, Responsable de Área.\n\n⚠️ En Postman: ir a 'Send and Download' en lugar de 'Send' para guardar el archivo."
+          }
+        },
+        {
+          "name": "⬇ Exportar Ceremonia de Premiación (Excel)",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/reportes/competencia/1/exportar/ceremonia",
+            "description": "REQUIERE competencia en estado 'avalada'.\nDevuelve archivo .xlsx con: Nombre, Unidad Educativa, Área, Nivel, Posición, Medalla."
+          }
+        },
+        {
+          "name": "⬇ Exportar Publicación Oficial (Excel)",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/reportes/competencia/1/exportar/publicacion",
+            "description": "REQUIERE competencia en estado 'avalada'.\nDevuelve archivo .xlsx con: Nombre, Área, Nivel, Lugar, Medalla."
+          }
+        },
+        {
+          "name": "⬇ Exportar Clasificados / No clasificados (Excel)",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/reportes/competencia/1/exportar/clasificados",
+            "description": "REQUIERE competencia en estado 'concluida' o 'avalada'.\nDevuelve archivo .xlsx con todos los competidores y su resultado: CLASIFICADO / NO_CLASIFICADO / DESCLASIFICADO."
+          }
+        }
+      ]
+    },
+
+    {
+      "name": "14 · Listas de Competidores",
+      "item": [
+        {
+          "name": "Lista completa con filtros",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/listaCompleta/1/2/3/4/F/Cochabamba",
+            "description": "Parámetros en URL: {idResponsable}/{idArea}/{idNivel}/{idGrado}/{genero?}/{departamento?}\ngenero y departamento son opcionales — omitir si no se filtra."
+          }
+        },
+        {
+          "name": "Competidores por competencia, área y nivel",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/competencias/1/area/2/nivel/3/competidores"
+          }
+        },
+        {
+          "name": "Áreas del responsable (para listas)",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/responsable/1",
+            "description": "Reemplazar '1' con id del responsable."
+          }
+        },
+        {
+          "name": "Niveles por área (para listas)",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/niveles/1/area",
+            "description": "Reemplazar '1' con id del área."
+          }
+        },
+        {
+          "name": "Grados por área y nivel",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/grados/1/nivel/2"
+          }
+        }
+      ]
+    },
+
+    {
+      "name": "15 · Estructura Académica",
+      "item": [
+        {
+          "name": "Áreas",
+          "item": [
+            {
+              "name": "Listar áreas",
+              "request": { "method": "GET", "url": "{{baseUrl}}/area" }
+            },
+            {
+              "name": "Áreas planas (olimpiada activa)",
+              "request": { "method": "GET", "url": "{{baseUrl}}/areas/actuales" }
+            },
+            {
+              "name": "Solo nombres de áreas activas",
+              "request": { "method": "GET", "url": "{{baseUrl}}/areas-nombres" }
+            },
+            {
+              "name": "Áreas por gestión",
+              "request": { "method": "GET", "url": "{{baseUrl}}/area/gestion/2025" }
+            },
+            {
+              "name": "Crear área",
+              "request": {
+                "method": "POST",
+                "url": "{{baseUrl}}/area",
+                "header": [{ "key": "Content-Type", "value": "application/json" }],
+                "body": { "mode": "raw", "raw": "{\n  \"nombre\": \"Robótica\"\n}" }
+              }
+            }
+          ]
+        },
+        {
+          "name": "Niveles",
+          "item": [
+            {
+              "name": "Listar niveles",
+              "request": { "method": "GET", "url": "{{baseUrl}}/niveles" }
+            },
+            {
+              "name": "Ver nivel",
+              "request": { "method": "GET", "url": "{{baseUrl}}/niveles/1" }
+            },
+            {
+              "name": "Crear nivel",
+              "request": {
+                "method": "POST",
+                "url": "{{baseUrl}}/niveles",
+                "header": [{ "key": "Content-Type", "value": "application/json" }],
+                "body": { "mode": "raw", "raw": "{\n  \"nombre\": \"Primaria\"\n}" }
+              }
+            }
+          ]
+        },
+        {
+          "name": "Grados de Escolaridad",
+          "item": [
+            {
+              "name": "Listar grados",
+              "request": { "method": "GET", "url": "{{baseUrl}}/grados-escolaridad" }
+            },
+            {
+              "name": "Crear grado",
+              "request": {
+                "method": "POST",
+                "url": "{{baseUrl}}/grados-escolaridad",
+                "header": [{ "key": "Content-Type", "value": "application/json" }],
+                "body": { "mode": "raw", "raw": "{\n  \"nombre\": \"Primero de Primaria\"\n}" }
+              }
+            },
+            {
+              "name": "Actualizar grado",
+              "request": {
+                "method": "PUT",
+                "url": "{{baseUrl}}/grados-escolaridad/1",
+                "header": [{ "key": "Content-Type", "value": "application/json" }],
+                "body": { "mode": "raw", "raw": "{\n  \"nombre\": \"Segundo de Primaria\"\n}" }
+              }
+            },
+            {
+              "name": "Eliminar grado",
+              "request": { "method": "DELETE", "url": "{{baseUrl}}/grados-escolaridad/1" }
+            }
+          ]
+        },
+        {
+          "name": "Área-Nivel",
+          "item": [
+            {
+              "name": "Área-Niveles actuales",
+              "request": { "method": "GET", "url": "{{baseUrl}}/area-nivel/actuales" }
+            },
+            {
+              "name": "Área-Niveles con detalle",
+              "request": { "method": "GET", "url": "{{baseUrl}}/area-nivel/detalle" }
+            },
+            {
+              "name": "Área-Niveles simplificado",
+              "request": { "method": "GET", "url": "{{baseUrl}}/area-nivel/sim/simplificado" }
+            },
+            {
+              "name": "Por olimpiada",
+              "request": { "method": "GET", "url": "{{baseUrl}}/area-nivel/1", "description": "Reemplazar '1' con id_olimpiada." }
+            },
+            {
+              "name": "Por olimpiada + área",
+              "request": { "method": "GET", "url": "{{baseUrl}}/area-nivel/olimpiada/1/area/2" }
+            },
+            {
+              "name": "Por gestión",
+              "request": { "method": "GET", "url": "{{baseUrl}}/area-nivel/gestion/2025" }
+            },
+            {
+              "name": "Por gestión + área",
+              "request": { "method": "GET", "url": "{{baseUrl}}/area-nivel/gestion/2025/area/2" }
+            }
+          ]
+        }
+      ]
+    },
+
+    {
+      "name": "16 · Fases y Cronogramas",
+      "item": [
+        {
+          "name": "Fases activas",
+          "request": { "method": "GET", "url": "{{baseUrl}}/fase-global/actuales" }
+        },
+        {
+          "name": "Ver fase",
+          "request": { "method": "GET", "url": "{{baseUrl}}/fase-global/1" }
+        },
+        {
+          "name": "Crear fase global",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/fase-global/configurar",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Fase Clasificatoria\",\n  \"codigo\": \"EVALUACION\",\n  \"orden\": 1,\n  \"fecha_inicio\": \"2025-07-01\",\n  \"fecha_fin\": \"2025-08-31\",\n  \"activar_ahora\": false\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "description": "codigo: 'CONFIGURACION' | 'EVALUACION' | 'FINAL'\norden: entero único por olimpiada."
+          }
+        },
+        {
+          "name": "Actualizar cronograma de fase",
+          "request": {
+            "method": "PATCH",
+            "url": "{{baseUrl}}/fase-global/1/cronograma",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fecha_inicio\": \"2025-07-10\",\n  \"fecha_fin\": \"2025-09-05\",\n  \"estado\": true\n}"
+            }
+          }
+        },
+        {
+          "name": "Cronogramas de fase activos",
+          "request": { "method": "GET", "url": "{{baseUrl}}/cronograma-fases/actuales" }
+        },
+        {
+          "name": "Listar cronogramas de fase",
+          "request": { "method": "GET", "url": "{{baseUrl}}/cronograma-fases" }
+        },
+        {
+          "name": "Crear cronograma de fase",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/cronograma-fases",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id_fase_global\": 2,\n  \"fecha_inicio\": \"2025-07-15 08:00:00\",\n  \"fecha_fin\": \"2025-07-15 17:00:00\",\n  \"descripcion\": \"Jornada de evaluación primer grupo\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Actualizar cronograma de fase",
+          "request": {
+            "method": "PUT",
+            "url": "{{baseUrl}}/cronograma-fases/1",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fecha_inicio\": \"2025-07-16 08:00:00\",\n  \"descripcion\": \"Descripción actualizada\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Eliminar cronograma de fase",
+          "request": { "method": "DELETE", "url": "{{baseUrl}}/cronograma-fases/1" }
+        }
+      ]
+    },
+
+    {
+      "name": "17 · Roles y Permisos",
+      "item": [
+        {
+          "name": "Ver matriz de roles",
+          "request": { "method": "GET", "url": "{{baseUrl}}/roles/matriz" }
+        },
+        {
+          "name": "Actualizar matriz de roles",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/roles/matriz",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"roles\": [\n    {\n      \"id_rol\": 1,\n      \"acciones\": [\n        { \"id_accion_sistema\": 2, \"activo\": true },\n        { \"id_accion_sistema\": 5, \"activo\": false }\n      ]\n    },\n    {\n      \"id_rol\": 2,\n      \"acciones\": [\n        { \"id_accion_sistema\": 3, \"activo\": true }\n      ]\n    }\n  ]\n}"
+            }
+          }
+        },
+        {
+          "name": "Acciones disponibles por rol, fase y gestión",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/rol/1/fase-global/2/gestion/1",
+            "description": "Consultar qué acciones puede realizar un rol en el contexto de una fase y gestión."
+          }
+        },
+        {
+          "name": "Listar acciones del sistema",
+          "request": { "method": "GET", "url": "{{baseUrl}}/acciones-sistema" }
+        },
+        {
+          "name": "Configuración de acciones por fase",
+          "request": { "method": "GET", "url": "{{baseUrl}}/configuracion-acciones" }
+        },
+        {
+          "name": "Actualizar configuración de acciones",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/configuracion-acciones",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"configuraciones\": [\n    { \"id_configuracion_accion\": 3, \"habilitada\": true },\n    { \"id_configuracion_accion\": 7, \"habilitada\": false }\n  ]\n}"
+            }
+          }
+        }
+      ]
+    },
+
+    {
+      "name": "18 · Geográficos e Instituciones",
+      "item": [
+        {
+          "name": "Listar departamentos (público)",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "GET",
+            "url": "{{baseUrl}}/departamentos"
+          }
+        },
+        {
+          "name": "Crear departamento",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/departamentos",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"nombre\": \"Beni\"\n}" }
+          }
+        },
+        {
+          "name": "Actualizar departamento",
+          "request": {
+            "method": "PUT",
+            "url": "{{baseUrl}}/departamentos/1",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"nombre\": \"El Beni\"\n}" }
+          }
+        },
+        {
+          "name": "Eliminar departamento",
+          "request": { "method": "DELETE", "url": "{{baseUrl}}/departamentos/1" }
+        },
+        {
+          "name": "Listar instituciones (público)",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "GET",
+            "url": "{{baseUrl}}/instituciones"
+          }
+        },
+        {
+          "name": "Crear institución",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/instituciones",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"nombre\": \"Colegio Nacional Bolívar\"\n}" }
+          }
+        },
+        {
+          "name": "Actualizar institución",
+          "request": {
+            "method": "PUT",
+            "url": "{{baseUrl}}/instituciones/1",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"nombre\": \"Colegio Bolívar\"\n}" }
+          }
+        },
+        {
+          "name": "Eliminar institución",
+          "request": { "method": "DELETE", "url": "{{baseUrl}}/instituciones/1" }
+        }
+      ]
+    },
+
+    {
+      "name": "19 · Búsquedas por CI",
+      "item": [
+        {
+          "name": "Buscar usuario por CI",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/usuarios/ci/1234567",
+            "description": "Útil para verificar si ya existe un usuario antes de crear responsable o evaluador."
+          }
+        }
+      ]
+    }
+
+  ]
+}
