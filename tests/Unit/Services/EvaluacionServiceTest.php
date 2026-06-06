@@ -3,8 +3,8 @@
 namespace Tests\Unit\Services;
 
 use Tests\TestCase;
-use App\Services\EvaluacionService;
-use App\Repositories\EvaluacionRepository;
+use App\Services\Evaluacion\EvaluacionService;
+use App\Repositories\Evaluacion\EvaluacionRepository;
 use App\Models\Evaluacion;
 use App\Models\Examen;
 use App\Exceptions\Dominio\EvaluacionException;
@@ -20,7 +20,8 @@ class EvaluacionServiceTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->repo    = Mockery::mock(EvaluacionRepository::class);
+        config(['broadcasting.default' => 'log']);
+        $this->repo     = Mockery::mock(EvaluacionRepository::class);
         $this->servicio = new EvaluacionService($this->repo);
     }
 
@@ -54,23 +55,50 @@ class EvaluacionServiceTest extends TestCase
         $examen                   = new Examen();
         $examen->estado_ejecucion = 'en_curso';
 
-        $persona        = new \stdClass();
+        $persona         = new \stdClass();
         $persona->nombre = 'María';
 
-        $usuarioBloqueo = Mockery::mock();
+        $usuarioBloqueo          = Mockery::mock();
         $usuarioBloqueo->persona = $persona;
 
         $evaluacion                = new Evaluacion();
         $evaluacion->setRelation('examen', $examen);
         $evaluacion->setRelation('usuarioBloqueo', $usuarioBloqueo);
-        $evaluacion->bloqueado_por  = 5;  // otro juez
-        $evaluacion->fecha_bloqueo  = now()->subMinute(1)->toDateTimeString(); // hace 1 minuto (< 5)
+        $evaluacion->bloqueado_por = 5;
+        $evaluacion->fecha_bloqueo = now()->subMinute(1)->toDateTimeString(); // hace 1 min (< 5 → sigue ocupada)
 
         $this->repo->shouldReceive('findForUpdate')->with(1)->andReturn($evaluacion)->once();
 
         DB::shouldReceive('transaction')->once()->andReturnUsing(fn ($cb) => $cb());
 
-        $this->servicio->bloquearFicha(1, 99); // juez 99 intenta tomar ficha del juez 5
+        $this->servicio->bloquearFicha(1, 99);
+    }
+
+    public function test_bloquear_ficha_zombie_expirada_permite_tomar_el_bloqueo(): void
+    {
+        // Ficha bloqueada hace más del timeout (10 min > 5 min) → debe liberarse y re-bloquearse
+        $examen                   = new Examen();
+        $examen->estado_ejecucion = 'en_curso';
+
+        $evaluacion                = new Evaluacion();
+        $evaluacion->setRelation('examen', $examen);
+        $evaluacion->setRelation('usuarioBloqueo', null);
+        $evaluacion->bloqueado_por = 5;
+        $evaluacion->fecha_bloqueo = now()->subMinutes(10)->toDateTimeString(); // hace 10 min (> 5 → expirada)
+
+        $evaluacionBloqueada = new Evaluacion();
+        $evaluacionBloqueada->setRelation('examen', $examen);
+        $evaluacionBloqueada->bloqueado_por = 99;
+
+        $this->repo->shouldReceive('findForUpdate')->with(1)->andReturn($evaluacion)->once();
+        $this->repo->shouldReceive('bloquear')->with($evaluacion, 99)->andReturn($evaluacionBloqueada)->once();
+
+        DB::shouldReceive('transaction')->once()->andReturnUsing(fn ($cb) => $cb());
+
+        // No debe lanzar excepción — el juez 99 puede tomar la ficha zombie
+        $resultado = $this->servicio->bloquearFicha(1, 99);
+
+        $this->assertEquals(99, $resultado->bloqueado_por);
     }
 
     // ─── guardarNota ───────────────────────────────────────────────────────────

@@ -3,7 +3,7 @@
 namespace Tests\Feature\Auth;
 
 use Tests\TestCase;
-use App\Services\UsuarioService;
+use App\Services\Auth\UsuarioService;
 use Illuminate\Support\Facades\RateLimiter;
 
 class LoginTest extends TestCase
@@ -11,8 +11,7 @@ class LoginTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        // Limpiar rate limiter antes de cada test
-        RateLimiter::clear('login');
+        // Parent already disables login rate limiter globally via TestCase::setUp().
     }
 
     public function test_login_exitoso_devuelve_token(): void
@@ -83,6 +82,8 @@ class LoginTest extends TestCase
 
     public function test_login_excede_rate_limit_devuelve_429(): void
     {
+        $this->enableLoginRateLimiter();
+
         $this->mock(UsuarioService::class, function ($mock) {
             $mock->shouldReceive('login')->andReturn(null);
         });

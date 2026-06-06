@@ -1,0 +1,29 @@
+<?php
+
+namespace App\Services\Area;
+
+use App\Models\Area;
+use App\Models\Olimpiada;
+use App\Repositories\Area\AreaRepository;
+use Illuminate\Support\Facades\Log;
+
+class AreaService {
+    protected $areaRepository;
+
+    public function __construct(AreaRepository $areaRepository){
+        $this->areaRepository = $areaRepository;
+    }
+
+    public function getAreaList(){
+        return $this->areaRepository->getAllAreas();
+    }
+
+    public function createNewArea(array $data){
+        return $this->areaRepository->createArea($data);
+    }
+
+    public function getAreasActuales()
+    {
+        return $this->areaRepository->getAreasByGestion('2025');
+    }
+}

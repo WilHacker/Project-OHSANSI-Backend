@@ -7,10 +7,10 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
 
-use App\Repositories\CompetenciaRepository;
-use App\Repositories\EvaluacionRepository;
-use App\Repositories\ExamenRepository;
-use App\Repositories\UsuarioRepository;
+use App\Repositories\Competencia\CompetenciaRepository;
+use App\Repositories\Evaluacion\EvaluacionRepository;
+use App\Repositories\Examen\ExamenRepository;
+use App\Repositories\Auth\UsuarioRepository;
 use App\Repositories\Interfaces\CompetenciaRepositoryInterface;
 use App\Repositories\Interfaces\EvaluacionRepositoryInterface;
 use App\Repositories\Interfaces\ExamenRepositoryInterface;

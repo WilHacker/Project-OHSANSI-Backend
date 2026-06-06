@@ -4,7 +4,7 @@ namespace Tests\Feature\Evaluacion;
 
 use Tests\TestCase;
 use App\Models\Usuario;
-use App\Services\EvaluacionService;
+use App\Services\Evaluacion\EvaluacionService;
 use App\Models\Evaluacion;
 use App\Models\Examen;
 use App\Exceptions\Dominio\EvaluacionException;

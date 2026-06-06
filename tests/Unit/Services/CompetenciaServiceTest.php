@@ -3,9 +3,9 @@
 namespace Tests\Unit\Services;
 
 use Tests\TestCase;
-use App\Services\CompetenciaService;
-use App\Repositories\CompetenciaRepository;
-use App\Repositories\UsuarioRepository;
+use App\Services\Competencia\CompetenciaService;
+use App\Repositories\Competencia\CompetenciaRepository;
+use App\Repositories\Auth\UsuarioRepository;
 use App\Models\Competencia;
 use App\Exceptions\Dominio\CompetenciaException;
 use App\Exceptions\Dominio\AutorizacionException;

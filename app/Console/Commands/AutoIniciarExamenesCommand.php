@@ -4,7 +4,7 @@ namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 use App\Models\Examen;
-use App\Services\ExamenService;
+use App\Services\Examen\ExamenService;
 use Illuminate\Support\Facades\Log;
 
 class AutoIniciarExamenesCommand extends Command

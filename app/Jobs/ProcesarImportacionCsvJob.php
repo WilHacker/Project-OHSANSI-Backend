@@ -3,7 +3,7 @@
 namespace App\Jobs;
 
 use App\Models\ArchivoCsv;
-use App\Services\CompetidorService;
+use App\Services\Competidor\CompetidorService;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;

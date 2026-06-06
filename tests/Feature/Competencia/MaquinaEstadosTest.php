@@ -4,7 +4,7 @@ namespace Tests\Feature\Competencia;
 
 use Tests\TestCase;
 use App\Models\Usuario;
-use App\Services\CompetenciaService;
+use App\Services\Competencia\CompetenciaService;
 use App\Exceptions\Dominio\CompetenciaException;
 use Mockery;
 
